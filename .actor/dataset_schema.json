@@ -13,6 +13,10 @@
                     "replyCount",
                     "repostCount",
                     "shareCount",
+                    "viewCount",
+                    "quoteCount",
+                    "mediaType",
+                    "publishedAtISO",
                     "postUrl",
                     "sourceType",
                     "sourceQuery"
@@ -48,6 +52,22 @@
                     "shareCount": {
                         "label": "Shares",
                         "format": "number"
+                    },
+                    "viewCount": {
+                        "label": "Views",
+                        "format": "number"
+                    },
+                    "quoteCount": {
+                        "label": "Quotes",
+                        "format": "number"
+                    },
+                    "mediaType": {
+                        "label": "Media Type",
+                        "format": "text"
+                    },
+                    "publishedAtISO": {
+                        "label": "Published (ISO)",
+                        "format": "date"
                     },
                     "postUrl": {
                         "label": "Post URL",

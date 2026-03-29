@@ -45,6 +45,40 @@
             "default": 5,
             "minimum": 1,
             "maximum": 20
+        },
+        "profileUrls": {
+            "title": "Profile URLs",
+            "type": "array",
+            "description": "Threads profile URLs to scrape posts from (e.g. https://www.threads.com/@zuck). Leading @ is optional.",
+            "editor": "stringList",
+            "items": { "type": "string" }
+        },
+        "postUrls": {
+            "title": "Post URLs",
+            "type": "array",
+            "description": "Individual Threads post URLs to scrape with replies (e.g. https://www.threads.com/@user/post/ABC123).",
+            "editor": "stringList",
+            "items": { "type": "string" }
+        },
+        "searchSort": {
+            "title": "Search Sort",
+            "type": "string",
+            "description": "Sort order for search results. Only applies to searchKeywords.",
+            "enum": ["top", "recent"],
+            "enumTitles": ["Top (default)", "Recent"],
+            "default": "top"
+        },
+        "dateFrom": {
+            "title": "Date From",
+            "type": "string",
+            "description": "Filter posts from this date (YYYY-MM-DD). Posts before this date are excluded.",
+            "editor": "textfield"
+        },
+        "dateTo": {
+            "title": "Date To",
+            "type": "string",
+            "description": "Filter posts until this date (YYYY-MM-DD). Posts after this date are excluded.",
+            "editor": "textfield"
         }
     },
     "required": []
