@@ -1,12 +1,15 @@
 import { Actor, log } from 'apify';
 import { PlaywrightCrawler, Dataset } from '@crawlee/playwright';
 import { getExtractScript, DEBUG_SCRIPT } from './extract.js';
+import { getReplyExtractScript } from './replies.js';
 import { validateInput } from './validation.js';
-import { buildSearchUrl, buildTagUrl } from './urls.js';
-import type { InputSchema, ThreadsPost, SourceType } from './types.js';
+import { buildSearchUrl, buildTagUrl, buildProfileUrl, buildPostUrl } from './urls.js';
+import type { InputSchema, ThreadsPost, ThreadsReply, SourceType } from './types.js';
 
 const HYDRATION_DELAY_MS = 3_000;
 const SCROLL_DELAY_MS = 2_000;
+const REPLY_SCROLL_COUNT = 3;
+const MAX_REPLIES_PER_POST = 20;
 
 interface RequestUserData {
     sourceType: SourceType;
@@ -24,8 +27,10 @@ let totalItems = 0;
 
 const sources: Array<[string[] | undefined, (q: string) => string, SourceType]> = [
     [input.feedUrls, (u) => u, 'feed'],
-    [input.searchKeywords, buildSearchUrl, 'search'],
+    [input.searchKeywords, (k) => buildSearchUrl(k, input.searchSort), 'search'],
     [input.searchTags, buildTagUrl, 'tag'],
+    [input.profileUrls, buildProfileUrl, 'profile'],
+    [input.postUrls, buildPostUrl, 'post'],
 ];
 
 const requests: { url: string; userData: RequestUserData }[] = [];
@@ -39,10 +44,27 @@ log.info('Starting Threads scraper', {
     feedUrls: input.feedUrls,
     searchKeywords: input.searchKeywords,
     searchTags: input.searchTags,
+    profileUrls: input.profileUrls,
+    postUrls: input.postUrls,
+    searchSort: input.searchSort,
+    dateFrom: input.dateFrom,
+    dateTo: input.dateTo,
     totalRequests: requests.length,
     maxPosts,
     scrollCount,
 });
+
+function filterByDateRange(posts: readonly ThreadsPost[]): ThreadsPost[] {
+    if (!input.dateFrom && !input.dateTo) return [...posts];
+
+    return posts.filter((post) => {
+        if (!post.publishedAtISO) return true;
+        const postDate = post.publishedAtISO.slice(0, 10);
+        if (input.dateFrom && postDate < input.dateFrom) return false;
+        if (input.dateTo && postDate > input.dateTo) return false;
+        return true;
+    });
+}
 
 const crawler = new PlaywrightCrawler({
     headless: true,
@@ -67,6 +89,33 @@ const crawler = new PlaywrightCrawler({
 
         await page.waitForTimeout(HYDRATION_DELAY_MS);
 
+        if (sourceType === 'post') {
+            for (let i = 0; i < REPLY_SCROLL_COUNT; i++) {
+                await page.evaluate('window.scrollBy(0, window.innerHeight * 2)');
+                await page.waitForTimeout(SCROLL_DELAY_MS);
+            }
+
+            const extractScript = getExtractScript(1, sourceType, sourceQuery);
+            const posts: ThreadsPost[] = await page.evaluate(extractScript);
+
+            if (posts.length > 0) {
+                const replyScript = getReplyExtractScript(MAX_REPLIES_PER_POST);
+                const replies: ThreadsReply[] = await page.evaluate(replyScript);
+                const postsWithReplies = posts.map((post) => ({ ...post, replies }));
+
+                const filtered = filterByDateRange(postsWithReplies);
+                if (filtered.length > 0) {
+                    await Dataset.pushData(filtered);
+                    totalItems += filtered.length;
+                }
+                log.info(`Extracted post with ${replies.length} replies from ${sourceQuery}`);
+            } else {
+                const debugInfo = await page.evaluate(DEBUG_SCRIPT);
+                log.warning('No post found on detail page. Structure:', debugInfo as Record<string, unknown>);
+            }
+            return;
+        }
+
         for (let i = 0; i < scrollCount; i++) {
             await page.evaluate('window.scrollBy(0, window.innerHeight * 2)');
             await page.waitForTimeout(SCROLL_DELAY_MS);
@@ -87,8 +136,12 @@ const crawler = new PlaywrightCrawler({
             await Actor.setValue(screenshotKey, screenshot, { contentType: 'image/png' });
             log.info(`Debug screenshot saved as "${screenshotKey}"`);
         } else {
-            await Dataset.pushData(posts);
-            totalItems += posts.length;
+            const filtered = filterByDateRange(posts);
+            if (filtered.length > 0) {
+                await Dataset.pushData(filtered);
+                totalItems += filtered.length;
+            }
+            log.info(`After date filter: ${filtered.length}/${posts.length} posts kept`);
         }
     },
 
