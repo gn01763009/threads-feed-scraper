@@ -1,0 +1,68 @@
+{
+    "actorSpecification": 1,
+    "fields": {},
+    "views": {
+        "overview": {
+            "title": "Overview",
+            "transformation": {
+                "fields": [
+                    "author",
+                    "content",
+                    "publishedAt",
+                    "likeCount",
+                    "replyCount",
+                    "repostCount",
+                    "shareCount",
+                    "postUrl",
+                    "sourceType",
+                    "sourceQuery"
+                ]
+            },
+            "display": {
+                "component": "table",
+                "properties": {
+                    "author": {
+                        "label": "Author",
+                        "format": "text"
+                    },
+                    "content": {
+                        "label": "Content",
+                        "format": "text"
+                    },
+                    "publishedAt": {
+                        "label": "Published",
+                        "format": "text"
+                    },
+                    "likeCount": {
+                        "label": "Likes",
+                        "format": "number"
+                    },
+                    "replyCount": {
+                        "label": "Replies",
+                        "format": "number"
+                    },
+                    "repostCount": {
+                        "label": "Reposts",
+                        "format": "number"
+                    },
+                    "shareCount": {
+                        "label": "Shares",
+                        "format": "number"
+                    },
+                    "postUrl": {
+                        "label": "Post URL",
+                        "format": "link"
+                    },
+                    "sourceType": {
+                        "label": "Source",
+                        "format": "text"
+                    },
+                    "sourceQuery": {
+                        "label": "Query",
+                        "format": "text"
+                    }
+                }
+            }
+        }
+    }
+}

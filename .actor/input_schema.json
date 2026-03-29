@@ -1,12 +1,30 @@
 {
-    "title": "Threads Custom Feed Scraper Input",
+    "title": "Threads Scraper Input",
     "type": "object",
     "schemaVersion": 1,
     "properties": {
         "feedUrls": {
             "title": "Feed URLs",
             "type": "array",
-            "description": "One or more Threads custom feed URLs (e.g. https://www.threads.com/custom_feed/18113589370710265)",
+            "description": "Threads custom feed URLs (e.g. https://www.threads.com/custom_feed/18113589370710265). Optional if searchKeywords or searchTags are provided.",
+            "editor": "stringList",
+            "items": {
+                "type": "string"
+            }
+        },
+        "searchKeywords": {
+            "title": "Search Keywords",
+            "type": "array",
+            "description": "Keywords to search on Threads (e.g. \"寵物醫療\", \"AI news\"). Results come from threads.com/search.",
+            "editor": "stringList",
+            "items": {
+                "type": "string"
+            }
+        },
+        "searchTags": {
+            "title": "Tags / Topics",
+            "type": "array",
+            "description": "Hashtags or topics to search on Threads (e.g. \"#寵物友善\", \"tech\"). Leading # is optional.",
             "editor": "stringList",
             "items": {
                 "type": "string"
@@ -15,7 +33,7 @@
         "maxPosts": {
             "title": "Max Posts",
             "type": "integer",
-            "description": "Maximum number of posts to scrape per feed",
+            "description": "Maximum number of posts to scrape per source",
             "default": 50,
             "minimum": 1,
             "maximum": 200
@@ -29,5 +47,5 @@
             "maximum": 20
         }
     },
-    "required": ["feedUrls"]
+    "required": []
 }

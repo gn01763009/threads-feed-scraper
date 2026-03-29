@@ -2,13 +2,17 @@
 	"$schema": "https://apify.com/schemas/v1/actor.ide.json",
 	"actorSpecification": 1,
 	"name": "threads-feed-scraper",
-	"title": "Threads Custom Feed Scraper",
-	"description": "Scrapes posts from Threads custom feed URLs using Playwright headless browser to handle client-side rendering.",
-	"version": "0.1",
+	"title": "Threads Feed & Search Scraper",
+	"description": "Scrapes posts from Threads custom feeds, keyword search results, and hashtag/topic pages using Playwright headless browser.",
+	"version": "0.2",
 	"buildTag": "latest",
 	"meta": {
 		"templateId": "ts-empty",
 		"generatedBy": "Claude Code with Claude Opus 4.6"
 	},
-	"dockerfile": "../Dockerfile"
+	"dockerfile": "../Dockerfile",
+	"output": "./output_schema.json",
+	"storages": {
+		"dataset": "./dataset_schema.json"
+	}
 }

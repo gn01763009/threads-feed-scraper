@@ -1,27 +1,45 @@
 import { Actor, log } from 'apify';
 import { PlaywrightCrawler, Dataset } from '@crawlee/playwright';
-import { getExtractScript, getDebugScript } from './extract.js';
-import type { ThreadsPost } from './extract.js';
+import { getExtractScript, DEBUG_SCRIPT } from './extract.js';
+import { validateInput } from './validation.js';
+import { buildSearchUrl, buildTagUrl } from './urls.js';
+import type { InputSchema, ThreadsPost, SourceType } from './types.js';
 
-interface InputSchema {
-    feedUrls: string[];
-    maxPosts?: number;
-    scrollCount?: number;
+const HYDRATION_DELAY_MS = 3_000;
+const SCROLL_DELAY_MS = 2_000;
+
+interface RequestUserData {
+    sourceType: SourceType;
+    sourceQuery: string;
 }
 
 await Actor.init();
 
-const input = await Actor.getInput<InputSchema>();
-
-if (!input?.feedUrls || input.feedUrls.length === 0) {
-    throw new Error('At least one feedUrls entry is required');
-}
+const rawInput = await Actor.getInput<InputSchema>();
+const input = validateInput(rawInput);
 
 const maxPosts = input.maxPosts ?? 50;
 const scrollCount = input.scrollCount ?? 5;
+let totalItems = 0;
 
-log.info('Starting Threads custom feed scraper', {
+const sources: Array<[string[] | undefined, (q: string) => string, SourceType]> = [
+    [input.feedUrls, (u) => u, 'feed'],
+    [input.searchKeywords, buildSearchUrl, 'search'],
+    [input.searchTags, buildTagUrl, 'tag'],
+];
+
+const requests: { url: string; userData: RequestUserData }[] = [];
+for (const [items, buildUrl, sourceType] of sources) {
+    for (const query of items ?? []) {
+        requests.push({ url: buildUrl(query), userData: { sourceType, sourceQuery: query } });
+    }
+}
+
+log.info('Starting Threads scraper', {
     feedUrls: input.feedUrls,
+    searchKeywords: input.searchKeywords,
+    searchTags: input.searchTags,
+    totalRequests: requests.length,
     maxPosts,
     scrollCount,
 });
@@ -40,43 +58,38 @@ const crawler = new PlaywrightCrawler({
         },
     },
     async requestHandler({ page, request }) {
-        const feedUrl = request.url;
-        log.info(`Navigating to feed: ${feedUrl}`);
+        const { sourceType, sourceQuery } = request.userData as RequestUserData;
+        log.info(`Navigating to ${sourceType}: ${request.url}`);
 
-        // Wait for initial content to render
         await page.waitForLoadState('networkidle', { timeout: 30_000 }).catch(() => {
             log.warning('Network idle timeout — proceeding with available content');
         });
 
-        // Give React time to hydrate
-        await page.waitForTimeout(3_000);
+        await page.waitForTimeout(HYDRATION_DELAY_MS);
 
-        // Scroll to load more posts
         for (let i = 0; i < scrollCount; i++) {
             await page.evaluate('window.scrollBy(0, window.innerHeight * 2)');
-            await page.waitForTimeout(2_000);
+            await page.waitForTimeout(SCROLL_DELAY_MS);
             log.info(`Scroll ${i + 1}/${scrollCount} complete`);
         }
 
-        // Extract posts using string-based evaluate to avoid tsx transpiler issues
-        const extractScript = getExtractScript(maxPosts, feedUrl);
+        const extractScript = getExtractScript(maxPosts, sourceType, sourceQuery);
         const posts: ThreadsPost[] = await page.evaluate(extractScript);
 
-        log.info(`Extracted ${posts.length} posts from ${feedUrl}`);
+        log.info(`Extracted ${posts.length} posts from ${sourceType}:${sourceQuery}`);
 
         if (posts.length === 0) {
-            // Debug: capture page structure
-            const debugScript = getDebugScript();
-            const debugInfo = await page.evaluate(debugScript);
+            const debugInfo = await page.evaluate(DEBUG_SCRIPT);
             log.warning('No posts found. Page structure:', debugInfo as Record<string, unknown>);
 
-            // Take screenshot for debugging
+            const screenshotKey = `debug-screenshot-${sourceType}-${Date.now()}`;
             const screenshot = await page.screenshot({ fullPage: false });
-            await Actor.setValue('debug-screenshot', screenshot, { contentType: 'image/png' });
-            log.info('Debug screenshot saved to key-value store as "debug-screenshot"');
+            await Actor.setValue(screenshotKey, screenshot, { contentType: 'image/png' });
+            log.info(`Debug screenshot saved as "${screenshotKey}"`);
+        } else {
+            await Dataset.pushData(posts);
+            totalItems += posts.length;
         }
-
-        await Dataset.pushData(posts);
     },
 
     failedRequestHandler(_ctx, error) {
@@ -84,10 +97,8 @@ const crawler = new PlaywrightCrawler({
     },
 });
 
-await crawler.run(input.feedUrls);
+await crawler.run(requests);
 
-const dataset = await Dataset.open();
-const info = await dataset.getInfo();
-log.info(`Scraping complete. Total items: ${info?.itemCount ?? 0}`);
+log.info(`Scraping complete. Total items: ${totalItems}`);
 
 await Actor.exit();
