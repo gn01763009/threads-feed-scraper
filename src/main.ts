@@ -29,8 +29,8 @@ const sources: Array<[string[] | undefined, (q: string) => string, SourceType]> 
     [input.feedUrls, (u) => u, 'feed'],
     [input.searchKeywords, (k) => buildSearchUrl(k, input.searchSort), 'search'],
     [input.searchTags, buildTagUrl, 'tag'],
-    [input.profileUrls, buildProfileUrl, 'profile'],
-    [input.postUrls, buildPostUrl, 'post'],
+    [input.profileUrls, (u) => u, 'profile'],
+    [input.postUrls, (u) => u, 'post'],
 ];
 
 const requests: { url: string; userData: RequestUserData }[] = [];

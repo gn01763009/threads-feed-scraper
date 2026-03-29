@@ -35,184 +35,186 @@ export function getExtractScript(
     sourceType: SourceType,
     sourceQuery: string,
 ): string {
-    return '(() => {\n'
-        + '    const results = [];\n'
-        + '    const seen = new Set();\n'
-        + '\n'
-        + '    let containers = document.querySelectorAll(\'[data-pressable-container="true"]\');\n'
-        + '\n'
-        + '    if (containers.length === 0) {\n'
-        + '        containers = document.querySelectorAll(\'div[role="article"], article\');\n'
-        + '    }\n'
-        + '\n'
-        + '    if (containers.length === 0) {\n'
-        + '        const postLinks = document.querySelectorAll(\'a[href*="/post/"]\');\n'
-        + '        const parentSet = new Set();\n'
-        + '        postLinks.forEach(link => {\n'
-        + '            let parent = link.parentElement;\n'
-        + '            for (let i = 0; i < 5 && parent; i++) {\n'
-        + '                if (parent.children.length > 2) {\n'
-        + '                    parentSet.add(parent);\n'
-        + '                    break;\n'
-        + '                }\n'
-        + '                parent = parent.parentElement;\n'
-        + '            }\n'
-        + '        });\n'
-        + '        containers = Array.from(parentSet);\n'
-        + '    }\n'
-        + '\n'
-        + '    const scrapedAt = new Date().toISOString();\n'
-        + '\n'
-        + '    const parseCount = (raw) => {\n'
-        + '        if (!raw) return 0;\n'
-        + '        const cleaned = raw.replace(/,/g, \'\');\n'
-        + '        const kMatch = cleaned.match(/^([\\\\d.]+)K$/i);\n'
-        + '        if (kMatch) return Math.round(parseFloat(kMatch[1]) * 1000);\n'
-        + '        const mMatch = cleaned.match(/^([\\\\d.]+)M$/i);\n'
-        + '        if (mMatch) return Math.round(parseFloat(mMatch[1]) * 1000000);\n'
-        + '        return parseInt(cleaned, 10) || 0;\n'
-        + '    };\n'
-        + '\n'
-        + '    const RELATIVE_PATTERN = /^(\\\\d+)([smhdw])$/i;\n'
-        + '    const ABSOLUTE_PATTERN = /^(\\\\d{2})\\\\/(\\\\d{2})\\\\/(\\\\d{2})$/;\n'
-        + '    const UNIT_TO_MS = { s: 1000, m: 60000, h: 3600000, d: 86400000, w: 604800000 };\n'
-        + '\n'
-        + '    const normalizeTimestamp = (raw) => {\n'
-        + '        if (!raw) return \'\';\n'
-        + '        const trimmed = raw.trim();\n'
-        + '        if (!trimmed) return \'\';\n'
-        + '        const relMatch = trimmed.match(RELATIVE_PATTERN);\n'
-        + '        if (relMatch) {\n'
-        + '            const val = parseInt(relMatch[1], 10);\n'
-        + '            const unit = relMatch[2].toLowerCase();\n'
-        + '            const ms = UNIT_TO_MS[unit];\n'
-        + '            if (ms) return new Date(Date.now() - val * ms).toISOString();\n'
-        + '        }\n'
-        + '        const absMatch = trimmed.match(ABSOLUTE_PATTERN);\n'
-        + '        if (absMatch) {\n'
-        + '            return new Date(\'20\' + absMatch[3] + \'-\' + absMatch[1] + \'-\' + absMatch[2] + \'T00:00:00.000Z\').toISOString();\n'
-        + '        }\n'
-        + '        return \'\';\n'
-        + '    };\n'
-        + '\n'
-        + '    const detectMediaType = (imageUrls, videoUrls) => {\n'
-        + '        const total = imageUrls.length + videoUrls.length;\n'
-        + '        if (total === 0) return \'text\';\n'
-        + '        if (total > 1) return \'carousel\';\n'
-        + '        if (videoUrls.length > 0) return \'video\';\n'
-        + '        return \'photo\';\n'
-        + '    };\n'
-        + '\n'
-        + '    for (const el of containers) {\n'
-        + '        if (results.length >= ' + maxPosts + ') break;\n'
-        + '\n'
-        + '        const textContent = (el.textContent || \'\').trim();\n'
-        + '        if (textContent.length < 10) continue;\n'
-        + '\n'
-        + '        const postLink = el.querySelector(\'a[href*="/post/"]\');\n'
-        + '        const postUrl = postLink ? postLink.href : \'\';\n'
-        + '\n'
-        + '        const postIdMatch = postUrl.match(/\\\\/post\\\\/([A-Za-z0-9_-]+)/);\n'
-        + '        const postId = postIdMatch ? postIdMatch[1] : \'unknown_\' + results.length;\n'
-        + '\n'
-        + '        if (seen.has(postId)) continue;\n'
-        + '        seen.add(postId);\n'
-        + '\n'
-        + '        const authorLink = el.querySelector(\'a[href^="/@"]\');\n'
-        + '        let author = \'unknown\';\n'
-        + '        if (authorLink) {\n'
-        + '            const linkText = (authorLink.textContent || \'\').trim();\n'
-        + '            if (linkText) {\n'
-        + '                author = linkText;\n'
-        + '            } else if (authorLink.href) {\n'
-        + '                const m = authorLink.href.match(/@([^/?]+)/);\n'
-        + '                if (m) author = m[1];\n'
-        + '            }\n'
-        + '        }\n'
-        + '\n'
-        + '        const timeEl = el.querySelector(\'time\');\n'
-        + '        const publishedAt = timeEl ? (timeEl.textContent || \'\').trim() : \'\';\n'
-        + '        const publishedAtISO = normalizeTimestamp(publishedAt);\n'
-        + '\n'
-        + '        const spans = el.querySelectorAll(\'span\');\n'
-        + '        let content = \'\';\n'
-        + '        for (const s of spans) {\n'
-        + '            const t = (s.textContent || \'\').trim();\n'
-        + '            if (t.length > 20 && t !== author && !/^\\\\d+[hmd]$/.test(t)) {\n'
-        + '                content = t;\n'
-        + '                break;\n'
-        + '            }\n'
-        + '        }\n'
-        + '\n'
-        + '        if (!content) {\n'
-        + '            content = textContent.slice(0, 500);\n'
-        + '        }\n'
-        + '\n'
-        + '        const images = el.querySelectorAll(\'img[src]\');\n'
-        + '        const videos = el.querySelectorAll(\'video source[src], video[src]\');\n'
-        + '        const imageUrls = [];\n'
-        + '        const videoUrls = [];\n'
-        + '\n'
-        + '        for (const img of images) {\n'
-        + '            const src = img.src || \'\';\n'
-        + '            if (src && !src.includes(\'profile\') && !src.includes(\'icon\') && !src.includes(\'emoji\')) {\n'
-        + '                imageUrls.push(src);\n'
-        + '            }\n'
-        + '        }\n'
-        + '\n'
-        + '        for (const vid of videos) {\n'
-        + '            const src = vid.src || \'\';\n'
-        + '            if (src) {\n'
-        + '                videoUrls.push(src);\n'
-        + '            }\n'
-        + '        }\n'
-        + '\n'
-        + '        const mediaType = detectMediaType(imageUrls, videoUrls);\n'
-        + '        const mediaUrls = [\n'
-        + '            ...imageUrls.map(u => ({ url: u, type: \'image\' })),\n'
-        + '            ...videoUrls.map(u => ({ url: u, type: \'video\' })),\n'
-        + '        ];\n'
-        + '\n'
-        + '        const buttons = el.querySelectorAll(\'[role="button"]\');\n'
-        + '        const engagement = { like: 0, comment: 0, repost: 0, share: 0, view: 0, quote: 0 };\n'
-        + '\n'
-        + '        for (const btn of buttons) {\n'
-        + '            const btnText = (btn.textContent || \'\').trim();\n'
-        + '            const countMatch = btnText.match(/^(?:Like|Comment|Repost|Share|View|Quote)([\\\\d.,]+[KkMm]?)$/);\n'
-        + '            if (!countMatch) continue;\n'
-        + '            const count = parseCount(countMatch[1]);\n'
-        + '            if (btnText.startsWith(\'Like\')) engagement.like = count;\n'
-        + '            else if (btnText.startsWith(\'Comment\')) engagement.comment = count;\n'
-        + '            else if (btnText.startsWith(\'Repost\')) engagement.repost = count;\n'
-        + '            else if (btnText.startsWith(\'Share\')) engagement.share = count;\n'
-        + '            else if (btnText.startsWith(\'View\')) engagement.view = count;\n'
-        + '            else if (btnText.startsWith(\'Quote\')) engagement.quote = count;\n'
-        + '        }\n'
-        + '\n'
-        + '        results.push({\n'
-        + '            postId,\n'
-        + '            author,\n'
-        + '            content,\n'
-        + '            publishedAt,\n'
-        + '            publishedAtISO,\n'
-        + '            likeCount: engagement.like,\n'
-        + '            replyCount: engagement.comment,\n'
-        + '            repostCount: engagement.repost,\n'
-        + '            shareCount: engagement.share,\n'
-        + '            viewCount: engagement.view,\n'
-        + '            quoteCount: engagement.quote,\n'
-        + '            mediaType,\n'
-        + '            mediaUrls,\n'
-        + '            postUrl,\n'
-        + '            sourceType: ' + JSON.stringify(sourceType) + ',\n'
-        + '            sourceQuery: ' + JSON.stringify(sourceQuery) + ',\n'
-        + '            scrapedAt,\n'
-        + '            replies: [],\n'
-        + '        });\n'
-        + '    }\n'
-        + '\n'
-        + '    return results;\n'
-        + '})()';
+    return `
+    (() => {
+        const results = [];
+        const seen = new Set();
+
+        let containers = document.querySelectorAll('[data-pressable-container="true"]');
+
+        if (containers.length === 0) {
+            containers = document.querySelectorAll('div[role="article"], article');
+        }
+
+        if (containers.length === 0) {
+            const postLinks = document.querySelectorAll('a[href*="/post/"]');
+            const parentSet = new Set();
+            postLinks.forEach(link => {
+                let parent = link.parentElement;
+                for (let i = 0; i < 5 && parent; i++) {
+                    if (parent.children.length > 2) {
+                        parentSet.add(parent);
+                        break;
+                    }
+                    parent = parent.parentElement;
+                }
+            });
+            containers = Array.from(parentSet);
+        }
+
+        const scrapedAt = new Date().toISOString();
+
+        const parseCount = (raw) => {
+            if (!raw) return 0;
+            const cleaned = raw.replace(/,/g, '');
+            const kMatch = cleaned.match(/^([\\d.]+)K$/i);
+            if (kMatch) return Math.round(parseFloat(kMatch[1]) * 1000);
+            const mMatch = cleaned.match(/^([\\d.]+)M$/i);
+            if (mMatch) return Math.round(parseFloat(mMatch[1]) * 1000000);
+            return parseInt(cleaned, 10) || 0;
+        };
+
+        const RELATIVE_PATTERN = /^(\\d+)([smhdw])$/i;
+        const ABSOLUTE_PATTERN = /^(\\d{2})\\/(\\d{2})\\/(\\d{2})$/;
+        const UNIT_TO_MS = { s: 1000, m: 60000, h: 3600000, d: 86400000, w: 604800000 };
+
+        const normalizeTimestamp = (raw) => {
+            if (!raw) return '';
+            const trimmed = raw.trim();
+            if (!trimmed) return '';
+            const relMatch = trimmed.match(RELATIVE_PATTERN);
+            if (relMatch) {
+                const val = parseInt(relMatch[1], 10);
+                const unit = relMatch[2].toLowerCase();
+                const ms = UNIT_TO_MS[unit];
+                if (ms) return new Date(Date.now() - val * ms).toISOString();
+            }
+            const absMatch = trimmed.match(ABSOLUTE_PATTERN);
+            if (absMatch) {
+                return new Date('20' + absMatch[3] + '-' + absMatch[1] + '-' + absMatch[2] + 'T00:00:00.000Z').toISOString();
+            }
+            return '';
+        };
+
+        const detectMediaType = (imageUrls, videoUrls) => {
+            const total = imageUrls.length + videoUrls.length;
+            if (total === 0) return 'text';
+            if (total > 1) return 'carousel';
+            if (videoUrls.length > 0) return 'video';
+            return 'photo';
+        };
+
+        for (const el of containers) {
+            if (results.length >= ${maxPosts}) break;
+
+            const textContent = (el.textContent || '').trim();
+            if (textContent.length < 10) continue;
+
+            const postLink = el.querySelector('a[href*="/post/"]');
+            const postUrl = postLink ? postLink.href : '';
+
+            const postIdMatch = postUrl.match(/\\/post\\/([A-Za-z0-9_-]+)/);
+            const postId = postIdMatch ? postIdMatch[1] : 'unknown_' + results.length;
+
+            if (seen.has(postId)) continue;
+            seen.add(postId);
+
+            const authorLink = el.querySelector('a[href^="/@"]');
+            let author = 'unknown';
+            if (authorLink) {
+                const linkText = (authorLink.textContent || '').trim();
+                if (linkText) {
+                    author = linkText;
+                } else if (authorLink.href) {
+                    const m = authorLink.href.match(/@([^/?]+)/);
+                    if (m) author = m[1];
+                }
+            }
+
+            const timeEl = el.querySelector('time');
+            const publishedAt = timeEl ? (timeEl.textContent || '').trim() : '';
+            const publishedAtISO = normalizeTimestamp(publishedAt);
+
+            const spans = el.querySelectorAll('span');
+            let content = '';
+            for (const s of spans) {
+                const t = (s.textContent || '').trim();
+                if (t.length > 20 && t !== author && !/^\\d+[hmd]$/.test(t)) {
+                    content = t;
+                    break;
+                }
+            }
+
+            if (!content) {
+                content = textContent.slice(0, 500);
+            }
+
+            const images = el.querySelectorAll('img[src]');
+            const videos = el.querySelectorAll('video source[src], video[src]');
+            const imageUrls = [];
+            const videoUrls = [];
+
+            for (const img of images) {
+                const src = img.src || '';
+                if (src && !src.includes('profile') && !src.includes('icon') && !src.includes('emoji')) {
+                    imageUrls.push(src);
+                }
+            }
+
+            for (const vid of videos) {
+                const src = vid.src || '';
+                if (src) {
+                    videoUrls.push(src);
+                }
+            }
+
+            const mediaType = detectMediaType(imageUrls, videoUrls);
+            const mediaUrls = [
+                ...imageUrls.map(u => ({ url: u, type: 'image' })),
+                ...videoUrls.map(u => ({ url: u, type: 'video' })),
+            ];
+
+            const buttons = el.querySelectorAll('[role="button"]');
+            const engagement = { like: 0, comment: 0, repost: 0, share: 0, view: 0, quote: 0 };
+
+            for (const btn of buttons) {
+                const btnText = (btn.textContent || '').trim();
+                const countMatch = btnText.match(/(Like|Comment|Repost|Share|View|Quote)(\\d[\\d.,]*[KkMm]?)/);
+                if (!countMatch) continue;
+                const count = parseCount(countMatch[2]);
+                if (countMatch[1] === 'Like') engagement.like = count;
+                else if (countMatch[1] === 'Comment') engagement.comment = count;
+                else if (countMatch[1] === 'Repost') engagement.repost = count;
+                else if (countMatch[1] === 'Share') engagement.share = count;
+                else if (countMatch[1] === 'View') engagement.view = count;
+                else if (countMatch[1] === 'Quote') engagement.quote = count;
+            }
+
+            results.push({
+                postId,
+                author,
+                content,
+                publishedAt,
+                publishedAtISO,
+                likeCount: engagement.like,
+                replyCount: engagement.comment,
+                repostCount: engagement.repost,
+                shareCount: engagement.share,
+                viewCount: engagement.view,
+                quoteCount: engagement.quote,
+                mediaType,
+                mediaUrls,
+                postUrl,
+                sourceType: ${JSON.stringify(sourceType)},
+                sourceQuery: ${JSON.stringify(sourceQuery)},
+                scrapedAt,
+                replies: [],
+            });
+        }
+
+        return results;
+    })()
+    `;
 }
 
 export const DEBUG_SCRIPT = `

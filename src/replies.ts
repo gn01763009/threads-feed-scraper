@@ -4,71 +4,73 @@
  */
 
 export function getReplyExtractScript(maxReplies: number): string {
-    return '(() => {\n'
-        + '    const replies = [];\n'
-        + '    const containers = document.querySelectorAll(\'[data-pressable-container="true"], div[role="article"], article\');\n'
-        + '\n'
-        + '    const replyContainers = Array.from(containers).slice(1);\n'
-        + '\n'
-        + '    const parseCount = (raw) => {\n'
-        + '        if (!raw) return 0;\n'
-        + '        const cleaned = raw.replace(/,/g, \'\');\n'
-        + '        const kMatch = cleaned.match(/^([\\\\d.]+)K$/i);\n'
-        + '        if (kMatch) return Math.round(parseFloat(kMatch[1]) * 1000);\n'
-        + '        const mMatch = cleaned.match(/^([\\\\d.]+)M$/i);\n'
-        + '        if (mMatch) return Math.round(parseFloat(mMatch[1]) * 1000000);\n'
-        + '        return parseInt(cleaned, 10) || 0;\n'
-        + '    };\n'
-        + '\n'
-        + '    for (const el of replyContainers) {\n'
-        + '        if (replies.length >= ' + maxReplies + ') break;\n'
-        + '\n'
-        + '        const textContent = (el.textContent || \'\').trim();\n'
-        + '        if (textContent.length < 5) continue;\n'
-        + '\n'
-        + '        const authorLink = el.querySelector(\'a[href^="/@"]\');\n'
-        + '        let author = \'unknown\';\n'
-        + '        if (authorLink) {\n'
-        + '            const linkText = (authorLink.textContent || \'\').trim();\n'
-        + '            if (linkText) {\n'
-        + '                author = linkText;\n'
-        + '            } else if (authorLink.href) {\n'
-        + '                const m = authorLink.href.match(/@([^/?]+)/);\n'
-        + '                if (m) author = m[1];\n'
-        + '            }\n'
-        + '        }\n'
-        + '\n'
-        + '        const timeEl = el.querySelector(\'time\');\n'
-        + '        const publishedAt = timeEl ? (timeEl.textContent || \'\').trim() : \'\';\n'
-        + '\n'
-        + '        const spans = el.querySelectorAll(\'span\');\n'
-        + '        let content = \'\';\n'
-        + '        for (const s of spans) {\n'
-        + '            const t = (s.textContent || \'\').trim();\n'
-        + '            if (t.length > 10 && t !== author && !/^\\\\d+[hmd]$/.test(t)) {\n'
-        + '                content = t;\n'
-        + '                break;\n'
-        + '            }\n'
-        + '        }\n'
-        + '\n'
-        + '        if (!content) {\n'
-        + '            content = textContent.slice(0, 500);\n'
-        + '        }\n'
-        + '\n'
-        + '        let likeCount = 0;\n'
-        + '        const buttons = el.querySelectorAll(\'[role="button"]\');\n'
-        + '        for (const btn of buttons) {\n'
-        + '            const btnText = (btn.textContent || \'\').trim();\n'
-        + '            const countMatch = btnText.match(/^Like([\\\\d.,]+[KkMm]?)$/);\n'
-        + '            if (countMatch) {\n'
-        + '                likeCount = parseCount(countMatch[1]);\n'
-        + '                break;\n'
-        + '            }\n'
-        + '        }\n'
-        + '\n'
-        + '        replies.push({ author, content, publishedAt, likeCount });\n'
-        + '    }\n'
-        + '\n'
-        + '    return replies;\n'
-        + '})()';
+    return `
+    (() => {
+        const replies = [];
+        const containers = document.querySelectorAll('[data-pressable-container="true"], div[role="article"], article');
+
+        const replyContainers = Array.from(containers).slice(1);
+
+        const parseCount = (raw) => {
+            if (!raw) return 0;
+            const cleaned = raw.replace(/,/g, '');
+            const kMatch = cleaned.match(/^([\\d.]+)K$/i);
+            if (kMatch) return Math.round(parseFloat(kMatch[1]) * 1000);
+            const mMatch = cleaned.match(/^([\\d.]+)M$/i);
+            if (mMatch) return Math.round(parseFloat(mMatch[1]) * 1000000);
+            return parseInt(cleaned, 10) || 0;
+        };
+
+        for (const el of replyContainers) {
+            if (replies.length >= ${maxReplies}) break;
+
+            const textContent = (el.textContent || '').trim();
+            if (textContent.length < 5) continue;
+
+            const authorLink = el.querySelector('a[href^="/@"]');
+            let author = 'unknown';
+            if (authorLink) {
+                const linkText = (authorLink.textContent || '').trim();
+                if (linkText) {
+                    author = linkText;
+                } else if (authorLink.href) {
+                    const m = authorLink.href.match(/@([^/?]+)/);
+                    if (m) author = m[1];
+                }
+            }
+
+            const timeEl = el.querySelector('time');
+            const publishedAt = timeEl ? (timeEl.textContent || '').trim() : '';
+
+            const spans = el.querySelectorAll('span');
+            let content = '';
+            for (const s of spans) {
+                const t = (s.textContent || '').trim();
+                if (t.length > 10 && t !== author && !/^\\d+[hmd]$/.test(t)) {
+                    content = t;
+                    break;
+                }
+            }
+
+            if (!content) {
+                content = textContent.slice(0, 500);
+            }
+
+            let likeCount = 0;
+            const buttons = el.querySelectorAll('[role="button"]');
+            for (const btn of buttons) {
+                const btnText = (btn.textContent || '').trim();
+                const countMatch = btnText.match(/^Like([\\d.,]+[KkMm]?)$/);
+                if (countMatch) {
+                    likeCount = parseCount(countMatch[1]);
+                    break;
+                }
+            }
+
+            replies.push({ author, content, publishedAt, likeCount });
+        }
+
+        return replies;
+    })()
+    `;
 }
