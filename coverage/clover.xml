@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1774795940501" clover="3.2.0">
+  <project timestamp="1774795940501" name="All files">
+    <metrics statements="94" coveredstatements="92" conditionals="78" coveredconditionals="76" methods="14" coveredmethods="13" elements="186" coveredelements="181" complexity="0" loc="94" ncloc="94" packages="1" files="6" classes="6"/>
+    <file name="extract.ts" path="/Users/reggie/reggie_coding_space/threads-feed-scraper/src/extract.ts">
+      <metrics statements="14" coveredstatements="13" conditionals="14" coveredconditionals="14" methods="3" coveredmethods="2"/>
+      <line num="9" count="8" type="cond" truecount="2" falsecount="0"/>
+      <line num="10" count="6" type="stmt"/>
+      <line num="11" count="6" type="stmt"/>
+      <line num="12" count="6" type="cond" truecount="2" falsecount="0"/>
+      <line num="13" count="4" type="stmt"/>
+      <line num="14" count="4" type="cond" truecount="2" falsecount="0"/>
+      <line num="15" count="3" type="cond" truecount="2" falsecount="0"/>
+      <line num="20" count="5" type="stmt"/>
+      <line num="21" count="5" type="cond" truecount="2" falsecount="0"/>
+      <line num="22" count="4" type="cond" truecount="2" falsecount="0"/>
+      <line num="23" count="2" type="cond" truecount="2" falsecount="0"/>
+      <line num="24" count="1" type="stmt"/>
+      <line num="38" count="0" type="stmt"/>
+      <line num="218" count="1" type="stmt"/>
+    </file>
+    <file name="replies.ts" path="/Users/reggie/reggie_coding_space/threads-feed-scraper/src/replies.ts">
+      <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+      <line num="7" count="2" type="stmt"/>
+    </file>
+    <file name="time.ts" path="/Users/reggie/reggie_coding_space/threads-feed-scraper/src/time.ts">
+      <metrics statements="19" coveredstatements="19" conditionals="8" coveredconditionals="7" methods="1" coveredmethods="1"/>
+      <line num="1" count="1" type="stmt"/>
+      <line num="2" count="1" type="stmt"/>
+      <line num="4" count="1" type="stmt"/>
+      <line num="13" count="9" type="stmt"/>
+      <line num="14" count="9" type="cond" truecount="2" falsecount="0"/>
+      <line num="16" count="8" type="stmt"/>
+      <line num="17" count="8" type="cond" truecount="2" falsecount="0"/>
+      <line num="18" count="5" type="stmt"/>
+      <line num="19" count="5" type="stmt"/>
+      <line num="20" count="5" type="stmt"/>
+      <line num="21" count="5" type="cond" truecount="1" falsecount="1"/>
+      <line num="22" count="5" type="stmt"/>
+      <line num="26" count="3" type="stmt"/>
+      <line num="27" count="3" type="cond" truecount="2" falsecount="0"/>
+      <line num="28" count="2" type="stmt"/>
+      <line num="29" count="2" type="stmt"/>
+      <line num="30" count="2" type="stmt"/>
+      <line num="31" count="2" type="stmt"/>
+      <line num="34" count="1" type="stmt"/>
+    </file>
+    <file name="types.ts" path="/Users/reggie/reggie_coding_space/threads-feed-scraper/src/types.ts">
+      <metrics statements="0" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+    </file>
+    <file name="urls.ts" path="/Users/reggie/reggie_coding_space/threads-feed-scraper/src/urls.ts">
+      <metrics statements="17" coveredstatements="17" conditionals="8" coveredconditionals="8" methods="4" coveredmethods="4"/>
+      <line num="3" count="1" type="stmt"/>
+      <line num="4" count="1" type="stmt"/>
+      <line num="7" count="4" type="stmt"/>
+      <line num="8" count="4" type="stmt"/>
+      <line num="9" count="4" type="cond" truecount="2" falsecount="0"/>
+      <line num="10" count="2" type="stmt"/>
+      <line num="11" count="2" type="cond" truecount="2" falsecount="0"/>
+      <line num="12" count="1" type="stmt"/>
+      <line num="15" count="4" type="stmt"/>
+      <line num="19" count="2" type="cond" truecount="2" falsecount="0"/>
+      <line num="20" count="2" type="stmt"/>
+      <line num="21" count="2" type="stmt"/>
+      <line num="22" count="2" type="stmt"/>
+      <line num="23" count="2" type="stmt"/>
+      <line num="27" count="2" type="cond" truecount="2" falsecount="0"/>
+      <line num="28" count="2" type="stmt"/>
+      <line num="32" count="1" type="stmt"/>
+    </file>
+    <file name="validation.ts" path="/Users/reggie/reggie_coding_space/threads-feed-scraper/src/validation.ts">
+      <metrics statements="43" coveredstatements="42" conditionals="48" coveredconditionals="47" methods="5" coveredmethods="5"/>
+      <line num="3" count="1" type="stmt"/>
+      <line num="4" count="1" type="stmt"/>
+      <line num="7" count="19" type="cond" truecount="2" falsecount="0"/>
+      <line num="8" count="1" type="stmt"/>
+      <line num="11" count="18" type="stmt"/>
+      <line num="12" count="18" type="stmt"/>
+      <line num="13" count="18" type="stmt"/>
+      <line num="14" count="18" type="stmt"/>
+      <line num="15" count="18" type="stmt"/>
+      <line num="17" count="18" type="cond" truecount="2" falsecount="0"/>
+      <line num="24" count="1" type="stmt"/>
+      <line num="29" count="17" type="stmt"/>
+      <line num="30" count="2" type="stmt"/>
+      <line num="33" count="16" type="stmt"/>
+      <line num="34" count="3" type="stmt"/>
+      <line num="35" count="3" type="stmt"/>
+      <line num="36" count="3" type="cond" truecount="2" falsecount="0"/>
+      <line num="37" count="1" type="stmt"/>
+      <line num="41" count="14" type="stmt"/>
+      <line num="42" count="2" type="stmt"/>
+      <line num="43" count="2" type="stmt"/>
+      <line num="44" count="2" type="cond" truecount="2" falsecount="0"/>
+      <line num="45" count="1" type="stmt"/>
+      <line num="49" count="13" type="cond" truecount="2" falsecount="0"/>
+      <line num="50" count="3" type="cond" truecount="2" falsecount="0"/>
+      <line num="51" count="1" type="stmt"/>
+      <line num="55" count="12" type="cond" truecount="2" falsecount="0"/>
+      <line num="56" count="3" type="cond" truecount="2" falsecount="0"/>
+      <line num="57" count="1" type="stmt"/>
+      <line num="61" count="11" type="cond" truecount="2" falsecount="0"/>
+      <line num="62" count="2" type="cond" truecount="2" falsecount="0"/>
+      <line num="63" count="1" type="stmt"/>
+      <line num="67" count="10" type="cond" truecount="5" falsecount="0"/>
+      <line num="68" count="1" type="stmt"/>
+      <line num="71" count="9" type="stmt"/>
+      <line num="86" count="7" type="stmt"/>
+      <line num="87" count="7" type="stmt"/>
+      <line num="88" count="7" type="cond" truecount="2" falsecount="0"/>
+      <line num="89" count="2" type="stmt"/>
+      <line num="92" count="2" type="cond" truecount="3" falsecount="1"/>
+      <line num="93" count="0" type="stmt"/>
+      <line num="98" count="90" type="cond" truecount="2" falsecount="0"/>
+      <line num="99" count="20" type="stmt"/>
+    </file>
+  </project>
+</coverage>
