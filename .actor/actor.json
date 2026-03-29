@@ -4,7 +4,7 @@
 	"name": "threads-feed-scraper",
 	"title": "Threads Feed & Search Scraper",
 	"description": "Scrapes posts from Threads custom feeds, keyword search results, and hashtag/topic pages using Playwright headless browser.",
-	"version": "0.2",
+	"version": "0.3",
 	"buildTag": "latest",
 	"meta": {
 		"templateId": "ts-empty",
