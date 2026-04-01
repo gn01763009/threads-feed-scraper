@@ -19,7 +19,16 @@ interface RequestUserData {
 await Actor.init();
 
 const rawInput = await Actor.getInput<InputSchema>();
-const input = validateInput(rawInput);
+
+let input: InputSchema;
+try {
+    input = validateInput(rawInput);
+} catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    log.error(`Input validation failed: ${message}`);
+    await Actor.fail(message);
+    throw err; // unreachable, but satisfies TypeScript
+}
 
 const maxPosts = input.maxPosts ?? 50;
 const scrollCount = input.scrollCount ?? 5;
@@ -73,10 +82,7 @@ const crawler = new PlaywrightCrawler({
     requestHandlerTimeoutSecs: 120,
     launchContext: {
         launchOptions: {
-            args: [
-                '--disable-blink-features=AutomationControlled',
-                '--no-sandbox',
-            ],
+            args: ['--disable-blink-features=AutomationControlled', '--no-sandbox'],
         },
     },
     async requestHandler({ page, request }) {

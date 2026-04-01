@@ -19,7 +19,8 @@
             "editor": "stringList",
             "items": {
                 "type": "string"
-            }
+            },
+            "prefill": ["AI news"]
         },
         "searchTags": {
             "title": "Tags / Topics",
