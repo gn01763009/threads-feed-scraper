@@ -106,7 +106,7 @@ const crawler = new PlaywrightCrawler({
             await page.evaluate(() => {
                 const dialog = document.querySelector('div[role="dialog"]');
                 if (!dialog) return;
-                const allButtons = dialog.querySelectorAll('[role="button"], button');
+                const allButtons = Array.from(dialog.querySelectorAll('[role="button"], button'));
                 for (const btn of allButtons) {
                     const ariaLabel = (btn.getAttribute('aria-label') || '').toLowerCase();
                     const text = (btn.textContent || '').trim().toLowerCase();
@@ -116,8 +116,7 @@ const crawler = new PlaywrightCrawler({
                     }
                 }
                 dialog.remove();
-                const overlays = document.querySelectorAll('div[style*="position: fixed"][style*="z-index"]');
-                overlays.forEach((el) => el.remove());
+                document.querySelectorAll('div[style*="position: fixed"][style*="z-index"]').forEach((el) => el.remove());
             });
 
             log.info('Dismissed login/signup modal');
@@ -194,7 +193,7 @@ const crawler = new PlaywrightCrawler({
             if (inRangeCount >= maxPosts) break;
 
             const loadMoreClicked = await page.evaluate(() => {
-                const buttons = document.querySelectorAll('div[role="button"], button, span[role="link"]');
+                const buttons = Array.from(document.querySelectorAll('div[role="button"], button, span[role="link"]'));
                 for (const btn of buttons) {
                     const text = (btn.textContent || '').trim().toLowerCase();
                     if (text.includes('show more') || text.includes('顯示更多') || text.includes('load more')) {
