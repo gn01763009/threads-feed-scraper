@@ -16,6 +16,13 @@ export interface ThreadsReply {
     likeCount: number;
 }
 
+export interface ThreadPart {
+    postId: string;
+    content: string;
+    postUrl: string;
+    mediaUrls: ThreadsMedia[];
+}
+
 export interface ThreadsPost {
     postId: string;
     author: string;
@@ -35,6 +42,7 @@ export interface ThreadsPost {
     sourceQuery: string;
     scrapedAt: string;
     replies: ThreadsReply[];
+    threadParts?: ThreadPart[];
 }
 
 export interface InputSchema {

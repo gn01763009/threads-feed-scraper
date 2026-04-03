@@ -4,6 +4,7 @@ import { getExtractScript, DEBUG_SCRIPT } from './extract.js';
 import { getReplyExtractScript } from './replies.js';
 import { validateInput } from './validation.js';
 import { buildSearchUrl, buildTagUrl, buildProfileUrl, buildPostUrl } from './urls.js';
+import { mergeThreadChains } from './threads.js';
 import type { InputSchema, ThreadsPost, ThreadsReply, SourceType } from './types.js';
 
 const HYDRATION_DELAY_MS = 3_000;
@@ -95,6 +96,35 @@ const crawler = new PlaywrightCrawler({
 
         await page.waitForTimeout(HYDRATION_DELAY_MS);
 
+        const dismissModal = async () => {
+            const hasDialog = await page.evaluate(() => !!document.querySelector('div[role="dialog"]'));
+            if (!hasDialog) return;
+
+            await page.keyboard.press('Escape');
+            await page.waitForTimeout(500);
+
+            await page.evaluate(() => {
+                const dialog = document.querySelector('div[role="dialog"]');
+                if (!dialog) return;
+                const allButtons = dialog.querySelectorAll('[role="button"], button');
+                for (const btn of allButtons) {
+                    const ariaLabel = (btn.getAttribute('aria-label') || '').toLowerCase();
+                    const text = (btn.textContent || '').trim().toLowerCase();
+                    if (ariaLabel.includes('close') || text === 'x' || text === '✕') {
+                        (btn as HTMLElement).click();
+                        return;
+                    }
+                }
+                dialog.remove();
+                const overlays = document.querySelectorAll('div[style*="position: fixed"][style*="z-index"]');
+                overlays.forEach((el) => el.remove());
+            });
+
+            log.info('Dismissed login/signup modal');
+        };
+
+        await dismissModal();
+
         if (sourceType === 'post') {
             for (let i = 0; i < REPLY_SCROLL_COUNT; i++) {
                 await page.evaluate('window.scrollBy(0, window.innerHeight * 2)');
@@ -122,16 +152,98 @@ const crawler = new PlaywrightCrawler({
             return;
         }
 
+        // Incremental extraction to handle DOM virtualization — Threads removes
+        // older posts from the DOM as new ones load.
+        const allPosts = new Map<string, ThreadsPost>();
+        const extractScript = getExtractScript(maxPosts, sourceType, sourceQuery);
+        const hasDateFilter = !!(input.dateFrom || input.dateTo);
+        let inRangeCount = 0;
+
+        const isInDateRange = (post: ThreadsPost): boolean => {
+            if (!hasDateFilter) return true;
+            if (!post.publishedAtISO) return true;
+            const postDate = post.publishedAtISO.slice(0, 10);
+            if (input.dateFrom && postDate < input.dateFrom) return false;
+            if (input.dateTo && postDate > input.dateTo) return false;
+            return true;
+        };
+
+        const collectPosts = async (): Promise<ThreadsPost[]> => {
+            const batch: ThreadsPost[] = await page.evaluate(extractScript);
+            for (const post of batch) {
+                if (!allPosts.has(post.postId)) {
+                    allPosts.set(post.postId, post);
+                    if (isInDateRange(post)) inRangeCount++;
+                }
+            }
+            return batch;
+        };
+
+        const hasScrolledPastDateRange = (batch: readonly ThreadsPost[]): boolean => {
+            if (!input.dateFrom) return false;
+            const dated = batch.filter((p) => p.publishedAtISO);
+            if (dated.length === 0) return false;
+            return dated.every((p) => p.publishedAtISO!.slice(0, 10) < input.dateFrom!);
+        };
+
+        const MAX_STALE_SCROLLS = 5;
+        await collectPosts();
+
+        let staleScrolls = 0;
         for (let i = 0; i < scrollCount; i++) {
+            if (inRangeCount >= maxPosts) break;
+
+            const loadMoreClicked = await page.evaluate(() => {
+                const buttons = document.querySelectorAll('div[role="button"], button, span[role="link"]');
+                for (const btn of buttons) {
+                    const text = (btn.textContent || '').trim().toLowerCase();
+                    if (text.includes('show more') || text.includes('顯示更多') || text.includes('load more')) {
+                        (btn as HTMLElement).click();
+                        return text;
+                    }
+                }
+                return null;
+            });
+
+            if (loadMoreClicked) {
+                log.info(`Clicked load-more button: "${loadMoreClicked}"`);
+                await page.waitForTimeout(SCROLL_DELAY_MS);
+            }
+
+            await dismissModal();
             await page.evaluate('window.scrollBy(0, window.innerHeight * 2)');
             await page.waitForTimeout(SCROLL_DELAY_MS);
-            log.info(`Scroll ${i + 1}/${scrollCount} complete`);
+            await page.waitForLoadState('networkidle', { timeout: 5_000 }).catch(() => {});
+
+            const prevSize = allPosts.size;
+            const latestBatch = await collectPosts();
+
+            log.info(`Scroll ${i + 1}/${scrollCount} — ${allPosts.size} total, ${inRangeCount} in date range`);
+
+            if (hasScrolledPastDateRange(latestBatch)) {
+                log.info('All visible posts are before dateFrom, stopping scroll');
+                break;
+            }
+
+            if (allPosts.size === prevSize) {
+                staleScrolls++;
+                if (staleScrolls >= MAX_STALE_SCROLLS) {
+                    log.info(`No new posts after ${MAX_STALE_SCROLLS} consecutive scrolls, stopping early`);
+                    break;
+                }
+            } else {
+                staleScrolls = 0;
+            }
         }
 
-        const extractScript = getExtractScript(maxPosts, sourceType, sourceQuery);
-        const posts: ThreadsPost[] = await page.evaluate(extractScript);
+        const filtered = filterByDateRange([...allPosts.values()]);
+        const merged = mergeThreadChains(filtered);
+        const posts = merged.slice(0, maxPosts);
+        const chainCount = merged.filter((p) => p.threadParts && p.threadParts.length > 1).length;
 
-        log.info(`Extracted ${posts.length} posts from ${sourceType}:${sourceQuery}`);
+        log.info(
+            `Extracted ${allPosts.size} raw → ${filtered.length} in date range → ${merged.length} after merging chains (${chainCount} thread chains found)`,
+        );
 
         if (posts.length === 0) {
             const debugInfo = await page.evaluate(DEBUG_SCRIPT);
@@ -142,17 +254,13 @@ const crawler = new PlaywrightCrawler({
             await Actor.setValue(screenshotKey, screenshot, { contentType: 'image/png' });
             log.info(`Debug screenshot saved as "${screenshotKey}"`);
         } else {
-            const filtered = filterByDateRange(posts);
-            if (filtered.length > 0) {
-                await Dataset.pushData(filtered);
-                totalItems += filtered.length;
-            }
-            log.info(`After date filter: ${filtered.length}/${posts.length} posts kept`);
+            await Dataset.pushData(posts);
+            totalItems += posts.length;
         }
     },
 
-    failedRequestHandler(_ctx, error) {
-        log.error(`Request failed: ${_ctx.request.url}`, { error: (error as Error).message });
+    failedRequestHandler({ request }, error) {
+        log.error(`Request failed: ${request.url}`, { error: (error as Error).message });
     },
 });
 
