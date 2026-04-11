@@ -2,8 +2,8 @@
 	"$schema": "https://apify.com/schemas/v1/actor.ide.json",
 	"actorSpecification": 1,
 	"name": "threads-feed-scraper",
-	"title": "Threads Feed & Search Scraper",
-	"description": "Scrapes posts from Threads custom feeds, keyword search results, and hashtag/topic pages using Playwright headless browser.",
+	"title": "Threads Scraper — Search, Posts, Profiles, Replies & Feeds",
+	"description": "All-in-one Meta Threads scraper: keyword search, hashtag topics, user profiles, single posts with replies, and custom feeds. Extracts engagement data (likes, replies, reposts, shares, views, quotes), media URLs, and timestamps. No login required. Threads API alternative.",
 	"version": "0.3",
 	"buildTag": "latest",
 	"meta": {

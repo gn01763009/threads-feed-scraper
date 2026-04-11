@@ -116,7 +116,9 @@ const crawler = new PlaywrightCrawler({
                     }
                 }
                 dialog.remove();
-                document.querySelectorAll('div[style*="position: fixed"][style*="z-index"]').forEach((el) => el.remove());
+                document
+                    .querySelectorAll('div[style*="position: fixed"][style*="z-index"]')
+                    .forEach((el) => el.remove());
             });
 
             log.info('Dismissed login/signup modal');
@@ -266,5 +268,26 @@ const crawler = new PlaywrightCrawler({
 await crawler.run(requests);
 
 log.info(`Scraping complete. Total items: ${totalItems}`);
+
+// Phase 1: Run telemetry for usage analytics
+try {
+    const telemetryDataset = await Actor.openDataset('run-telemetry');
+    await telemetryDataset.pushData({
+        runId: Actor.getEnv().actorRunId,
+        sourceTypes: requests.map((r) => r.userData.sourceType),
+        queries: requests.map((r) => r.userData.sourceQuery),
+        postCount: totalItems,
+        requestCount: requests.length,
+        scrollCount: input.scrollCount ?? 5,
+        maxPosts: input.maxPosts ?? 50,
+        searchSort: input.searchSort ?? 'top',
+        hasDateFilter: !!(input.dateFrom || input.dateTo),
+        actorVersion: '0.3',
+        timestamp: new Date().toISOString(),
+    });
+    log.debug('Run telemetry recorded');
+} catch (err) {
+    log.warning('Failed to record run telemetry', { error: (err as Error).message });
+}
 
 await Actor.exit();

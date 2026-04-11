@@ -1,5 +1,5 @@
 {
-    "title": "Threads Scraper Input",
+    "title": "Threads Scraper — Search, Posts, Profiles, Replies & Feeds",
     "type": "object",
     "schemaVersion": 1,
     "properties": {
@@ -29,7 +29,8 @@
             "editor": "stringList",
             "items": {
                 "type": "string"
-            }
+            },
+            "prefill": ["tech"]
         },
         "maxPosts": {
             "title": "Max Posts",
@@ -52,7 +53,8 @@
             "type": "array",
             "description": "Threads profile URLs to scrape posts from (e.g. https://www.threads.com/@zuck). Leading @ is optional.",
             "editor": "stringList",
-            "items": { "type": "string" }
+            "items": { "type": "string" },
+            "prefill": ["https://www.threads.com/@zuck"]
         },
         "postUrls": {
             "title": "Post URLs",
