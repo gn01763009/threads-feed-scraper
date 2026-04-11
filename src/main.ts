@@ -269,25 +269,40 @@ await crawler.run(requests);
 
 log.info(`Scraping complete. Total items: ${totalItems}`);
 
-// Phase 1: Run telemetry for usage analytics
-try {
-    const telemetryDataset = await Actor.openDataset('run-telemetry');
-    await telemetryDataset.pushData({
-        runId: Actor.getEnv().actorRunId,
-        sourceTypes: requests.map((r) => r.userData.sourceType),
-        queries: requests.map((r) => r.userData.sourceQuery),
-        postCount: totalItems,
-        requestCount: requests.length,
-        scrollCount: input.scrollCount ?? 5,
-        maxPosts: input.maxPosts ?? 50,
-        searchSort: input.searchSort ?? 'top',
-        hasDateFilter: !!(input.dateFrom || input.dateTo),
-        actorVersion: '0.3',
-        timestamp: new Date().toISOString(),
-    });
-    log.debug('Run telemetry recorded');
-} catch (err) {
-    log.warning('Failed to record run telemetry', { error: (err as Error).message });
+// Run telemetry: push usage data to developer's own dataset via API
+const telemetryDatasetId = process.env.TELEMETRY_DATASET_ID;
+const telemetryToken = process.env.TELEMETRY_TOKEN;
+if (telemetryDatasetId && telemetryToken) {
+    try {
+        const telemetryPayload = {
+            runId: Actor.getEnv().actorRunId,
+            sourceTypes: requests.map((r) => r.userData.sourceType),
+            queries: requests.map((r) => r.userData.sourceQuery),
+            postCount: totalItems,
+            requestCount: requests.length,
+            scrollCount: input.scrollCount ?? 5,
+            maxPosts: input.maxPosts ?? 50,
+            searchSort: input.searchSort ?? 'top',
+            hasDateFilter: !!(input.dateFrom || input.dateTo),
+            actorVersion: '0.3',
+            timestamp: new Date().toISOString(),
+        };
+        const res = await fetch(
+            `https://api.apify.com/v2/datasets/${telemetryDatasetId}/items?token=${telemetryToken}`,
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify([telemetryPayload]),
+            },
+        );
+        if (res.ok) {
+            log.debug('Run telemetry recorded');
+        } else {
+            log.warning(`Telemetry push failed: ${res.status}`);
+        }
+    } catch (err) {
+        log.warning('Failed to record run telemetry', { error: (err as Error).message });
+    }
 }
 
 await Actor.exit();
