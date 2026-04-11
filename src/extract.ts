@@ -146,7 +146,35 @@ export function getExtractScript(
             }
 
             if (!content) {
-                content = textContent.slice(0, 500);
+                // Try shorter spans (some posts have very short text)
+                for (const s of spans) {
+                    const t = (s.textContent || '').trim();
+                    // Strip author name to check if there's real content left
+                    const stripped = t.replace(new RegExp(author.replace(/[.*+?^\${}()|[\\]\\\\]/g, '\\\\$&'), 'g'), '').trim();
+                    if (t.length > 1 && t !== author && !/^\\d+[smhdw]$/.test(t)
+                        && !/(Like|Comment|Repost|Share|View|Quote)\\d/.test(t)
+                        && !/Audio is/.test(t) && !/Verified/.test(t)
+                        && !/^Follow$/.test(t)
+                        && !/^\\d{2}\\/\\d{2}\\/\\d{2}$/.test(t)
+                        && stripped.length > 0) {
+                        content = t;
+                        break;
+                    }
+                }
+            }
+
+            if (!content) {
+                // Final fallback: strip UI artifacts from raw text
+                const cleaned = textContent
+                    .replace(new RegExp(author.replace(/[.*+?^\${}()|[\\]\\\\]/g, '\\\\$&'), 'g'), '')
+                    .replace(/\\d+[smhdw]\\b/g, '')
+                    .replace(/(Like|Comment|Repost|Share|View|Quote)\\d[\\d.,]*[KkMm]?/g, '')
+                    .replace(/Audio is (muted|on)/g, '')
+                    .replace(/Verified/g, '')
+                    .replace(/Follow/g, '')
+                    .replace(/\\s+/g, ' ')
+                    .trim();
+                content = cleaned.length > 0 ? cleaned.slice(0, 500) : '';
             }
 
             const images = el.querySelectorAll('img[src]');
