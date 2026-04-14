@@ -1,0 +1,11 @@
+{
+    "actorOutputSchemaVersion": 1,
+    "title": "Saída do Threads Scraper",
+    "properties": {
+        "dataset": {
+            "type": "string",
+            "title": "Posts extraídos",
+            "template": "{{links.apiDefaultDatasetUrl}}/items"
+        }
+    }
+}

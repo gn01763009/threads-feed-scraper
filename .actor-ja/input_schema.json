@@ -1,0 +1,111 @@
+{
+    "title": "Threadsスクレイパー — 投稿・プロフィール・ハッシュタグ・キーワード検索",
+    "type": "object",
+    "schemaVersion": 1,
+    "properties": {
+        "mode": {
+            "title": "🎯 モード",
+            "type": "string",
+            "description": "何を取得しますか?モードを選んで、下の該当セクションを入力してください。",
+            "editor": "select",
+            "enum": ["user", "hashtag", "search", "post", "feed"],
+            "enumTitles": [
+                "👤 ユーザープロフィール — ユーザー名から",
+                "🏷️ ハッシュタグ / トピック",
+                "🔎 キーワード検索",
+                "💬 単一投稿 + 返信",
+                "📰 カスタムフィードURL"
+            ],
+            "default": "user",
+            "prefill": "user",
+            "sectionCaption": "🎯 モード"
+        },
+
+        "usernames": {
+            "title": "👤 ユーザー名",
+            "type": "array",
+            "description": "Threadsのユーザー名(@やURL不要)。例:zuck、mosseri。モード=Userの時に使用します。",
+            "editor": "stringList",
+            "items": { "type": "string" },
+            "uniqueItems": true,
+            "maxItems": 100,
+            "prefill": ["zuck"],
+            "sectionCaption": "👤 ユーザーモード"
+        },
+        "bulkUsernames": {
+            "title": "📋 ユーザー名を一括貼り付け",
+            "type": "string",
+            "description": "**1行に1つのユーザー名**、改行で区切ります。**引用符やカンマは不要です。** 例:\n\n```\nzuck\nmosseri\nfinkd\n```\n\nGoogleスプレッドシートやExcelの列を直接コピーして貼り付けられます。実行時に上のユーザー名リストと統合されます。",
+            "editor": "textarea"
+        },
+
+        "keywords": {
+            "title": "🏷️ キーワード / タグ",
+            "type": "array",
+            "description": "検索モードのキーワード、またはハッシュタグモードのタグ(#は省略可)。例:AIニュース、#テック。",
+            "editor": "stringList",
+            "items": { "type": "string" },
+            "uniqueItems": true,
+            "maxItems": 100,
+            "sectionCaption": "🏷️ ハッシュタグ / キーワードモード"
+        },
+        "bulkKeywords": {
+            "title": "📋 キーワードを一括貼り付け",
+            "type": "string",
+            "description": "**1行に1つのキーワードまたはハッシュタグ**、改行で区切ります。**引用符やカンマは不要です。** 例:\n\n```\nLLMエージェント\nバイブコーディング\n#AI\n```\n\n実行時に上のキーワードリストと統合されます。",
+            "editor": "textarea"
+        },
+        "searchSort": {
+            "title": "🔀 検索ソート",
+            "type": "string",
+            "description": "キーワード検索結果のソート順。検索モードのみに適用されます。",
+            "editor": "select",
+            "enum": ["top", "recent"],
+            "enumTitles": ["トップ(デフォルト)", "最新"],
+            "default": "top"
+        },
+
+        "dateFrom": {
+            "title": "📅 開始日",
+            "type": "string",
+            "description": "投稿の最も古い日付。YYYY-MM-DD、または\"7 days\"、\"1 month\"のような相対表記が使えます。",
+            "editor": "datepicker",
+            "sectionCaption": "📅 日付範囲(検索 / ハッシュタグモード)"
+        },
+        "dateTo": {
+            "title": "📅 終了日",
+            "type": "string",
+            "description": "投稿の最も新しい日付。開始日と同じ形式。",
+            "editor": "datepicker"
+        },
+
+        "postUrls": {
+            "title": "💬 投稿URL",
+            "type": "array",
+            "description": "Threadsの投稿の完全なURL。モード=Postの時に使用します。例:https://www.threads.com/@user/post/ABC123。",
+            "editor": "stringList",
+            "items": { "type": "string" },
+            "uniqueItems": true,
+            "sectionCaption": "💬 投稿 / フィードモード"
+        },
+        "feedUrls": {
+            "title": "📰 フィードURL",
+            "type": "array",
+            "description": "Threadsのカスタムフィードのurl。モード=Feedの時に使用します。例:https://www.threads.com/custom_feed/18113589370710265。",
+            "editor": "stringList",
+            "items": { "type": "string" },
+            "uniqueItems": true
+        },
+
+        "maxPosts": {
+            "title": "📊 最大投稿数",
+            "type": "integer",
+            "description": "1ソースあたりの最大取得件数。多いほど課金対象の結果が増えます(1件$0.005)。スクロールは自動管理されます。",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 500,
+            "sectionCaption": "⚙️ 一般設定"
+        }
+    },
+    "required": []
+}

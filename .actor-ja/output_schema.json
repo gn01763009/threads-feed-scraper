@@ -1,0 +1,11 @@
+{
+    "actorOutputSchemaVersion": 1,
+    "title": "Threadsスクレイパー出力",
+    "properties": {
+        "dataset": {
+            "type": "string",
+            "title": "取得した投稿",
+            "template": "{{links.apiDefaultDatasetUrl}}/items"
+        }
+    }
+}

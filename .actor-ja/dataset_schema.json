@@ -1,0 +1,46 @@
+{
+    "actorSpecification": 1,
+    "fields": {},
+    "views": {
+        "overview": {
+            "title": "概要",
+            "transformation": {
+                "fields": [
+                    "author",
+                    "content",
+                    "publishedAt",
+                    "likeCount",
+                    "replyCount",
+                    "repostCount",
+                    "shareCount",
+                    "viewCount",
+                    "quoteCount",
+                    "mediaType",
+                    "publishedAtISO",
+                    "postUrl",
+                    "sourceType",
+                    "sourceQuery"
+                ]
+            },
+            "display": {
+                "component": "table",
+                "properties": {
+                    "author": { "label": "投稿者", "format": "text" },
+                    "content": { "label": "本文", "format": "text" },
+                    "publishedAt": { "label": "投稿日時", "format": "text" },
+                    "likeCount": { "label": "いいね", "format": "number" },
+                    "replyCount": { "label": "返信", "format": "number" },
+                    "repostCount": { "label": "リポスト", "format": "number" },
+                    "shareCount": { "label": "シェア", "format": "number" },
+                    "viewCount": { "label": "表示回数", "format": "number" },
+                    "quoteCount": { "label": "引用", "format": "number" },
+                    "mediaType": { "label": "メディア種別", "format": "text" },
+                    "publishedAtISO": { "label": "投稿日時(ISO)", "format": "date" },
+                    "postUrl": { "label": "投稿URL", "format": "link" },
+                    "sourceType": { "label": "取得元", "format": "text" },
+                    "sourceQuery": { "label": "クエリ", "format": "text" }
+                }
+            }
+        }
+    }
+}

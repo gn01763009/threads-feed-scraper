@@ -1,0 +1,111 @@
+{
+    "title": "Threads Scraper — Posts, Perfis, Hashtags e Busca por Palavra-chave",
+    "type": "object",
+    "schemaVersion": 1,
+    "properties": {
+        "mode": {
+            "title": "🎯 Modo",
+            "type": "string",
+            "description": "O que você quer extrair? Escolha um modo e preencha a seção correspondente abaixo.",
+            "editor": "select",
+            "enum": ["user", "hashtag", "search", "post", "feed"],
+            "enumTitles": [
+                "👤 Perfis de usuário — por username",
+                "🏷️ Hashtag / tópico",
+                "🔎 Busca por palavra-chave",
+                "💬 Post individual + respostas",
+                "📰 URL de feed personalizado"
+            ],
+            "default": "user",
+            "prefill": "user",
+            "sectionCaption": "🎯 Modo"
+        },
+
+        "usernames": {
+            "title": "👤 Usernames",
+            "type": "array",
+            "description": "Usernames do Threads (sem @, sem URL). Exemplo: zuck, mosseri. Usado quando o Modo = User.",
+            "editor": "stringList",
+            "items": { "type": "string" },
+            "uniqueItems": true,
+            "maxItems": 100,
+            "prefill": ["zuck"],
+            "sectionCaption": "👤 Modo Usuário"
+        },
+        "bulkUsernames": {
+            "title": "📋 Colar usernames em massa",
+            "type": "string",
+            "description": "**Um username por linha**, pressione Enter entre cada um. **Sem aspas, sem vírgulas.** Exemplo:\n\n```\nzuck\nmosseri\nfinkd\n```\n\nVocê pode copiar uma coluna direto do Google Sheets ou Excel. Mesclado com a lista de Usernames em tempo de execução.",
+            "editor": "textarea"
+        },
+
+        "keywords": {
+            "title": "🏷️ Palavras-chave / Tags",
+            "type": "array",
+            "description": "Palavras-chave para o modo Busca, ou hashtags para o modo Hashtag (# inicial opcional). Exemplo: notícias IA, #tecnologia.",
+            "editor": "stringList",
+            "items": { "type": "string" },
+            "uniqueItems": true,
+            "maxItems": 100,
+            "sectionCaption": "🏷️ Modo Hashtag / Palavra-chave"
+        },
+        "bulkKeywords": {
+            "title": "📋 Colar palavras-chave em massa",
+            "type": "string",
+            "description": "**Uma palavra-chave ou hashtag por linha**, pressione Enter entre cada uma. **Sem aspas, sem vírgulas.** Exemplo:\n\n```\nagentes LLM\ncoding com IA\n#AI\n```\n\nMesclado com a lista de Palavras-chave em tempo de execução.",
+            "editor": "textarea"
+        },
+        "searchSort": {
+            "title": "🔀 Ordenação da busca",
+            "type": "string",
+            "description": "Ordem dos resultados da busca por palavra-chave. Aplica-se apenas ao Modo = Busca.",
+            "editor": "select",
+            "enum": ["top", "recent"],
+            "enumTitles": ["Top (padrão)", "Recentes"],
+            "default": "top"
+        },
+
+        "dateFrom": {
+            "title": "📅 Data inicial",
+            "type": "string",
+            "description": "Data mais antiga dos posts. Aceita YYYY-MM-DD ou uma expressão relativa como \"7 days\", \"1 month\".",
+            "editor": "datepicker",
+            "sectionCaption": "📅 Intervalo de datas (modos busca / hashtag)"
+        },
+        "dateTo": {
+            "title": "📅 Data final",
+            "type": "string",
+            "description": "Data mais recente dos posts. Aceita YYYY-MM-DD ou uma expressão relativa.",
+            "editor": "datepicker"
+        },
+
+        "postUrls": {
+            "title": "💬 URLs de posts",
+            "type": "array",
+            "description": "URLs completas de posts do Threads. Usado quando Modo = Post. Exemplo: https://www.threads.com/@user/post/ABC123.",
+            "editor": "stringList",
+            "items": { "type": "string" },
+            "uniqueItems": true,
+            "sectionCaption": "💬 Modos Post / Feed"
+        },
+        "feedUrls": {
+            "title": "📰 URLs de feed",
+            "type": "array",
+            "description": "URLs de feeds personalizados do Threads. Usado quando Modo = Feed. Exemplo: https://www.threads.com/custom_feed/18113589370710265.",
+            "editor": "stringList",
+            "items": { "type": "string" },
+            "uniqueItems": true
+        },
+
+        "maxPosts": {
+            "title": "📊 Máximo de posts",
+            "type": "integer",
+            "description": "Número máximo de posts por fonte. Mais posts = mais resultados faturáveis ($0.005 cada). A rolagem é gerenciada automaticamente.",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 500,
+            "sectionCaption": "⚙️ Configurações gerais"
+        }
+    },
+    "required": []
+}

@@ -1,0 +1,46 @@
+{
+    "actorSpecification": 1,
+    "fields": {},
+    "views": {
+        "overview": {
+            "title": "Visão geral",
+            "transformation": {
+                "fields": [
+                    "author",
+                    "content",
+                    "publishedAt",
+                    "likeCount",
+                    "replyCount",
+                    "repostCount",
+                    "shareCount",
+                    "viewCount",
+                    "quoteCount",
+                    "mediaType",
+                    "publishedAtISO",
+                    "postUrl",
+                    "sourceType",
+                    "sourceQuery"
+                ]
+            },
+            "display": {
+                "component": "table",
+                "properties": {
+                    "author": { "label": "Autor", "format": "text" },
+                    "content": { "label": "Conteúdo", "format": "text" },
+                    "publishedAt": { "label": "Publicado", "format": "text" },
+                    "likeCount": { "label": "Curtidas", "format": "number" },
+                    "replyCount": { "label": "Respostas", "format": "number" },
+                    "repostCount": { "label": "Reposts", "format": "number" },
+                    "shareCount": { "label": "Compartilhamentos", "format": "number" },
+                    "viewCount": { "label": "Visualizações", "format": "number" },
+                    "quoteCount": { "label": "Citações", "format": "number" },
+                    "mediaType": { "label": "Tipo de mídia", "format": "text" },
+                    "publishedAtISO": { "label": "Publicado (ISO)", "format": "date" },
+                    "postUrl": { "label": "URL do post", "format": "link" },
+                    "sourceType": { "label": "Origem", "format": "text" },
+                    "sourceQuery": { "label": "Consulta", "format": "text" }
+                }
+            }
+        }
+    }
+}
