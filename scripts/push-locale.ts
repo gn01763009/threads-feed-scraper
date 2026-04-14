@@ -6,23 +6,28 @@
  *   locale = zh-tw | en | pt-br | ja
  *
  * Default locale is zh-tw — it lives directly in .actor/ and README.md
- * because that's the listing with existing traffic (slot:
- * threads-feed-scraper). Other locales live in .actor-{locale}/ with
- * their own README.md inside that directory.
+ * because that's the listing with existing traffic. Other locales live in
+ * .actor-{locale}/ with their own README.md inside that directory.
  *
  * Workflow for non-default locales:
- *   1. Copy .actor-{locale}/* over .actor/
- *   2. Copy .actor-{locale}/README.md over ./README.md
- *   3. Run `apify push` (which publishes to the slot defined in actor.json)
- *   4. Restore .actor/ and README.md from git
+ *   1. Require a clean git tree so we can't lose uncommitted work on restore.
+ *   2. Copy .actor-{locale}/* over .actor/
+ *   3. Copy .actor-{locale}/README.md over ./README.md
+ *   4. Run `apify push --force` (non-interactive, auto-creates missing slots)
+ *   5. Always restore .actor/ and README.md via `git checkout` — safe now
+ *      that we verified the tree was clean before we touched anything.
+ *   6. Also delete any stray files the copy may have left behind (e.g.
+ *      .actor/README.md that isn't part of the default locale layout).
  */
 
 import { execFileSync } from 'node:child_process';
-import { cpSync, existsSync } from 'node:fs';
+import { cpSync, existsSync, rmSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const SUPPORTED_LOCALES = ['zh-tw', 'en', 'pt-br', 'ja'] as const;
 const DEFAULT_LOCALE = 'zh-tw';
+const SWAPPED_PATHS = ['.actor', 'README.md'];
+const STRAY_CLEANUP_PATHS = ['.actor/README.md'];
 
 type Locale = (typeof SUPPORTED_LOCALES)[number];
 
@@ -33,6 +38,45 @@ function isLocale(value: string): value is Locale {
 function run(cmd: string, args: string[]): void {
     console.log(`$ ${cmd} ${args.join(' ')}`);
     execFileSync(cmd, args, { stdio: 'inherit' });
+}
+
+function runCapture(cmd: string, args: string[]): string {
+    return execFileSync(cmd, args, { encoding: 'utf8' }).trim();
+}
+
+/**
+ * Abort if any of the files we're about to swap have uncommitted changes.
+ * Without this check, a failed push followed by `git checkout` in the
+ * finally block would silently wipe hours of work.
+ */
+function assertSwapPathsClean(repoRoot: string): void {
+    const status = runCapture('git', [
+        '-C',
+        repoRoot,
+        'status',
+        '--porcelain',
+        '--',
+        ...SWAPPED_PATHS,
+    ]);
+    if (status.length > 0) {
+        console.error('❌ Refusing to push: swap paths have uncommitted changes.');
+        console.error(status);
+        console.error('\nCommit (or stash) your work first:');
+        console.error('  git add .actor README.md && git commit -m "..."');
+        process.exit(1);
+    }
+}
+
+function restoreSwappedPaths(repoRoot: string): void {
+    console.log('Restoring swapped paths from git');
+    run('git', ['-C', repoRoot, 'checkout', '--', ...SWAPPED_PATHS]);
+    for (const stray of STRAY_CLEANUP_PATHS) {
+        const strayPath = resolve(repoRoot, stray);
+        if (existsSync(strayPath)) {
+            console.log(`Removing stray file: ${stray}`);
+            rmSync(strayPath, { force: true });
+        }
+    }
 }
 
 function main(): void {
@@ -51,6 +95,8 @@ function main(): void {
     const needsSwap = locale !== DEFAULT_LOCALE;
 
     if (needsSwap) {
+        assertSwapPathsClean(repoRoot);
+
         if (!existsSync(localeDir)) {
             console.error(`Missing locale directory: ${localeDir}`);
             console.error(`Create it with the per-locale actor.json, input_schema.json, and README.md.`);
@@ -67,11 +113,16 @@ function main(): void {
     }
 
     try {
-        run('npx', ['-y', 'apify-cli', 'push']);
+        // --force bypasses interactive prompts (e.g. "actor doesn't exist,
+        // create it?") so first-time pushes for new locales work headless.
+        run('npx', ['-y', 'apify-cli', 'push', '--force']);
     } finally {
         if (needsSwap) {
-            console.log('Restoring .actor/ and README.md from git');
-            run('git', ['checkout', '--', '.actor', 'README.md']);
+            try {
+                restoreSwappedPaths(repoRoot);
+            } catch (err) {
+                console.error('⚠️  Restore failed — working tree may be dirty:', err);
+            }
         }
     }
 
