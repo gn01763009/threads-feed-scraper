@@ -3,7 +3,7 @@
 	"actorSpecification": 1,
 	"name": "threads-scraper",
 	"title": "Threads Scraper — Posts, Profiles, Hashtag & Keyword Search",
-	"description": "One actor, five Threads scraping modes: user profiles, hashtag topics, keyword search, single posts with replies, and custom feeds. Bulk-paste up to 100 usernames or keywords, relative-date filters (\"7 days\", \"1 month\"), full engagement metrics (likes, replies, reposts, shares, views, quotes), ISO timestamps, media URLs. No login, no API token. Flat $0.005 per result, no start fee.",
+	"description": "Five Threads scraping modes in one actor: user profiles, hashtag topics, keyword search, single posts with replies, and custom feeds. Bulk-paste up to 100 usernames or keywords, relative-date filters, engagement metrics, ISO timestamps. No login. $0.005/result.",
 	"version": "1.0",
 	"buildTag": "latest",
 	"meta": {
