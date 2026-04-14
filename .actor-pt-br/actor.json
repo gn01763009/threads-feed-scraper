@@ -2,7 +2,7 @@
 	"$schema": "https://apify.com/schemas/v1/actor.ide.json",
 	"actorSpecification": 1,
 	"name": "threads-scraper-br",
-	"title": "Threads Scraper — Posts, Perfis, Hashtags e Busca por Palavra-chave",
+	"title": "Threads Scraper — Posts, Perfis, Hashtag & Palavra-chave",
 	"description": "Cinco modos num só actor: perfis, hashtags, busca por palavra-chave, posts com respostas e feeds personalizados. Cole em massa até 100 usuários ou termos, filtros de data relativa, métricas de engajamento, timestamps ISO. Sem login. $0.005 por resultado.",
 	"version": "1.0",
 	"buildTag": "latest",
