@@ -3,7 +3,7 @@
     "fields": {},
     "views": {
         "overview": {
-            "title": "總覽",
+            "title": "Overview",
             "transformation": {
                 "fields": [
                     "author",
@@ -26,59 +26,59 @@
                 "component": "table",
                 "properties": {
                     "author": {
-                        "label": "作者",
+                        "label": "Author",
                         "format": "text"
                     },
                     "content": {
-                        "label": "內容",
+                        "label": "Content",
                         "format": "text"
                     },
                     "publishedAt": {
-                        "label": "發佈時間",
+                        "label": "Published",
                         "format": "text"
                     },
                     "likeCount": {
-                        "label": "讚數",
+                        "label": "Likes",
                         "format": "number"
                     },
                     "replyCount": {
-                        "label": "回覆數",
+                        "label": "Replies",
                         "format": "number"
                     },
                     "repostCount": {
-                        "label": "轉發數",
+                        "label": "Reposts",
                         "format": "number"
                     },
                     "shareCount": {
-                        "label": "分享數",
+                        "label": "Shares",
                         "format": "number"
                     },
                     "viewCount": {
-                        "label": "觀看數",
+                        "label": "Views",
                         "format": "number"
                     },
                     "quoteCount": {
-                        "label": "引用數",
+                        "label": "Quotes",
                         "format": "number"
                     },
                     "mediaType": {
-                        "label": "媒體類型",
+                        "label": "Media Type",
                         "format": "text"
                     },
                     "publishedAtISO": {
-                        "label": "發佈時間 (ISO)",
+                        "label": "Published (ISO)",
                         "format": "date"
                     },
                     "postUrl": {
-                        "label": "貼文連結",
+                        "label": "Post URL",
                         "format": "link"
                     },
                     "sourceType": {
-                        "label": "來源模式",
+                        "label": "Source",
                         "format": "text"
                     },
                     "sourceQuery": {
-                        "label": "查詢條件",
+                        "label": "Query",
                         "format": "text"
                     }
                 }

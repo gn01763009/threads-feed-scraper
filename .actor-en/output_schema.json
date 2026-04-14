@@ -1,0 +1,11 @@
+{
+    "actorOutputSchemaVersion": 1,
+    "title": "Threads Feed & Search Scraper Output",
+    "properties": {
+        "dataset": {
+            "type": "string",
+            "title": "Scraped Posts",
+            "template": "{{links.apiDefaultDatasetUrl}}/items"
+        }
+    }
+}

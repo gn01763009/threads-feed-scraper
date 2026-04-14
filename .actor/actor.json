@@ -2,9 +2,9 @@
 	"$schema": "https://apify.com/schemas/v1/actor.ide.json",
 	"actorSpecification": 1,
 	"name": "threads-feed-scraper",
-	"title": "Threads Scraper — Search, Posts, Profiles, Replies & Feeds",
-	"description": "All-in-one Meta Threads scraper: keyword search, hashtag topics, user profiles, single posts with replies, and custom feeds. Extracts engagement data (likes, replies, reposts, shares, views, quotes), media URLs, and timestamps. No login required. Threads API alternative.",
-	"version": "0.3",
+	"title": "Meta Threads 爬蟲 — 貼文、用戶、標籤與關鍵字一次搞定",
+	"description": "一個 Actor 搞定五種模式：用戶主頁、標籤話題、關鍵字搜尋、單篇貼文（含留言）、自訂動態。批量貼上 100 個帳號、支援相對日期（「7 天」、「1 個月」）、完整互動數據（讚、回覆、轉發、分享、觀看、引用）、ISO 時間戳、媒體網址。不用登入、不用 API token。每筆結果 $0.005。",
+	"version": "1.0",
 	"buildTag": "latest",
 	"meta": {
 		"templateId": "ts-empty",

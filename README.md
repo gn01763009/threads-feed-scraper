@@ -1,29 +1,21 @@
-# Threads 全方位爬蟲 — 搜尋、貼文、用戶、留言、動態一次搞定
+# Meta Threads 爬蟲 — 貼文、用戶、標籤與關鍵字一次搞定
 
-從 Meta Threads 抓取貼文 — 支援自訂動態、關鍵字搜尋、hashtag 話題、用戶頁面、單篇貼文五種模式。擷取貼文內容、作者資訊、媒體連結、留言回覆，以及完整互動數據（讚、回覆、轉發、分享、觀看、引用）。不需要登入。
+一個 Actor 搞定 Threads 上五種你會用到的抓取模式：**用戶主頁**、**標籤話題**、**關鍵字搜尋**、**單篇貼文 + 留言**、**自訂動態 feed**。不需要登入、不需要 API token、批量貼上 100 個帳號都吃得下。輸出欄位該有的全部都有：讚、回覆、轉發、分享、觀看、引用、媒體網址、ISO 時間。每筆結果 **$0.005**，沒有啟動費。
 
-## 為什麼選這個爬蟲？
+給誰用的：做品牌輿情的、追 KOL 的、寫競品報告的、跑 SaaS 串 Threads 資料的、論文需要資料集的、自己寫 side project 的工程師。
 
-大多數 Threads 爬蟲只做一件事：抓貼文、或抓用戶、或抓搜尋結果。這個 Actor **五種模式全包**，一次執行就搞定：
+---
 
-| 模式 | 功能 | 其他爬蟲 |
-|------|------|----------|
-| **關鍵字搜尋** | 依關鍵字搜尋 Threads，可排序 | 部分有 |
-| **標籤 / 話題** | 抓取 hashtag 話題頁面 | 部分有 |
-| **用戶頁面** | 抓取某用戶所有貼文 | 部分有 |
-| **單篇貼文 + 留言** | 抓取貼文及其回覆串 | 少見 |
-| **自訂動態** | 抓取 Threads 自訂 feed 網址 | 獨家 |
+## 能抓到什麼
 
-一個 Actor，一次執行，五種模式任意組合。不需要串接多個爬蟲。
-
-## 可以抓到哪些資料？
+每一篇貼文都會拿到下面這些欄位：
 
 | 欄位 | 說明 | 範例 |
 |------|------|------|
-| `postId` | 貼文唯一識別碼 | `DWOlac1D3-Z` |
-| `author` | 作者帳號 | `popopo_ki` |
+| `postId` | 貼文 ID | `DWOlac1D3-Z` |
+| `author` | 作者帳號 | `ponbu` |
 | `content` | 貼文全文 | `東森寵物大里國光店 打烊之後把狗留在...` |
-| `publishedAt` | 發佈時間（原始格式） | `5d` 或 `03/04/26` |
+| `publishedAt` | 發佈時間（原始） | `5d` 或 `03/04/26` |
 | `publishedAtISO` | 發佈時間（ISO 8601） | `2026-03-24T05:16:47.304Z` |
 | `likeCount` | 讚數 | `48700` |
 | `replyCount` | 回覆數 | `6300` |
@@ -32,180 +24,168 @@
 | `viewCount` | 觀看數 | `150000` |
 | `quoteCount` | 引用數 | `230` |
 | `mediaType` | 媒體類型 | `text`、`photo`、`video`、`carousel` |
-| `mediaUrls` | 媒體連結 | `[{ url: "...", type: "image" }]` |
-| `postUrl` | 貼文連結 | `https://www.threads.com/@user/post/...` |
-| `sourceType` | 資料來源模式 | `feed`、`search`、`tag`、`profile`、`post` |
-| `sourceQuery` | 使用的查詢條件 | `寵物醫療` |
-| `scrapedAt` | 抓取時間 | `2026-03-29T05:23:28.617Z` |
-| `replies` | 留言回覆（僅 post 模式） | `[{ author, content, publishedAt, likeCount }]` |
+| `mediaUrls` | 媒體連結陣列 | `[{ url, type }]` |
+| `postUrl` | 貼文網址 | `https://www.threads.com/@user/post/...` |
+| `sourceType` | 這筆從哪個模式來的 | `profile`、`tag`、`search`、`post`、`feed` |
+| `sourceQuery` | 抓取時用的查詢條件 | `寵物醫療` |
+| `scrapedAt` | 抓取當下時間 | `2026-03-29T05:23:28.617Z` |
+| `threadParts` | 如果是串文，自動合併每一段 | `[{ postId, content, postUrl, mediaUrls }]` |
+| `replies` | 留言（只有 post 模式才有） | `[{ author, content, publishedAt, likeCount }]` |
 
-## 使用方式
+Dataset 欄位名稱是英文（`username`、`like_count` 那種），方便你下游的程式接。
 
-1. **選擇抓取模式**（可在同一次執行中組合使用）：
+---
 
-   - **關鍵字搜尋** — 輸入想搜尋的關鍵字，可選擇排序方式（熱門 / 最新）
-   - **標籤 / 話題** — 輸入 hashtag 來抓取話題頁面
-   - **用戶頁面** — 貼上用戶 profile 網址，抓取該用戶的貼文
-   - **單篇貼文** — 貼上貼文網址，抓取該篇貼文及其留言回覆
-   - **自訂動態** — 貼上 Threads 自訂 feed 網址
+## 五種模式一個爬蟲
 
-2. **設定限制** — 選擇每個來源最多抓幾篇（`maxPosts`），以及向下捲動幾次載入更多內容（`scrollCount`）。
+別人家的 Threads 爬蟲常常拆成 4-5 個不同的 Actor，你要抓用戶一個、抓標籤又一個、抓留言再一個，串 API 串到想關電腦。這個就是把全部塞在同一個 Actor 裡，選 Mode 就好。
 
-3. **日期篩選**（選填） — 設定 `dateFrom` 和 `dateTo` 來篩選特定日期範圍內的貼文。
+| 模式 | 幹嘛用的 | 要填哪個欄位 |
+|------|----------|--------------|
+| 👤 **User** | 抓某個用戶的所有貼文 | `usernames[]` |
+| 🏷️ **Hashtag** | 抓 hashtag 話題頁面 | `keywords[]` |
+| 🔎 **Search** | 關鍵字搜尋（可選熱門 / 最新） | `keywords[]` + `searchSort` |
+| 💬 **Post** | 單篇貼文 + 前 20 則留言 | `postUrls[]` |
+| 📰 **Feed** | Threads 自訂 feed 網址 | `feedUrls[]` |
 
-4. **執行 Actor** — 點「Start」後等待結果。每個來源通常在 60 秒內完成。
+一次跑一個 mode，從 Apify Console 的下拉選單選就好。
 
-5. **匯出資料** — 可下載 JSON、CSV 或 Excel，或透過 API 串接。
+---
 
-### 輸入參數
+## 輸入欄位
 
-| 參數 | 類型 | 必填 | 預設值 | 說明 |
-|------|------|:----:|:------:|------|
-| `feedUrls` | string[] | 否 | - | Threads 自訂 feed 網址 |
-| `searchKeywords` | string[] | 否 | - | 搜尋關鍵字 |
-| `searchTags` | string[] | 否 | - | Hashtag / 話題（開頭 `#` 可省略） |
-| `profileUrls` | string[] | 否 | - | 用戶 profile 網址（如 `https://www.threads.com/@zuck`） |
-| `postUrls` | string[] | 否 | - | 單篇貼文網址（會同時抓取留言） |
-| `maxPosts` | integer | 否 | 50 | 每個來源最多抓取貼文數（1-200） |
-| `scrollCount` | integer | 否 | 5 | 捲動次數（1-20） |
-| `searchSort` | string | 否 | `top` | 搜尋排序：`top`（熱門）或 `recent`（最新） |
-| `dateFrom` | string | 否 | - | 篩選起始日期（YYYY-MM-DD） |
-| `dateTo` | string | 否 | - | 篩選結束日期（YYYY-MM-DD） |
+| 欄位 | 型別 | 必填 | 預設 | 說明 |
+|------|------|:----:|:----:|------|
+| `mode` | enum | 建議填 | `user` | `user` / `hashtag` / `search` / `post` / `feed` 擇一。不填的話會自動偵測你填了什麼欄位。 |
+| `usernames` | string[] | `user` 模式必填 | — | 純帳號，不用加 `@` 也不用貼整串網址。單次最多 **100** 個。 |
+| `bulkUsernames` | string | 選填 | — | 貼上一整欄 Google Sheet / Excel 的帳號（一行一個），會自動併進 `usernames`。適合懶人模式。 |
+| `keywords` | string[] | `hashtag` / `search` 必填 | — | 關鍵字或 hashtag（開頭 `#` 可有可無）。單次最多 **100** 個。 |
+| `bulkKeywords` | string | 選填 | — | 同上，一行一個關鍵字貼上去就好。 |
+| `postUrls` | string[] | `post` 模式必填 | — | Threads 貼文完整網址，留言會一起抓。 |
+| `feedUrls` | string[] | `feed` 模式必填 | — | Threads 自訂 feed 網址。 |
+| `searchSort` | enum | 選填 | `top` | `top`（熱門）或 `recent`（最新），只對 `search` 模式有效。 |
+| `dateFrom` | string | 選填 | — | `YYYY-MM-DD` **或**相對日期：`7 days`、`1 month`、`2 weeks`、`1 year`。 |
+| `dateTo` | string | 選填 | — | 同 `dateFrom` 格式。 |
+| `maxPosts` | integer | 選填 | `50` | 每個來源最多抓幾篇（1-500）。捲動次數會自動算，你不用管。 |
 
-以上來源參數都是選填，但**至少要填一個**。
+---
 
-### 輸入範例
+## 範例
 
-```json
-{
-    "feedUrls": ["https://www.threads.com/custom_feed/18113589370710265"],
-    "searchKeywords": ["寵物醫療", "pet health"],
-    "searchTags": ["#寵物友善", "#petfriendly"],
-    "profileUrls": ["https://www.threads.com/@zuck"],
-    "postUrls": ["https://www.threads.com/@user/post/ABC123"],
-    "maxPosts": 50,
-    "scrollCount": 5,
-    "searchSort": "recent",
-    "dateFrom": "2026-03-01",
-    "dateTo": "2026-03-29"
-}
-```
-
-### 輸出範例
+**👤 抓一批 Threads 紅人**
 
 ```json
 {
-    "postId": "DWOlac1D3-Z",
-    "author": "popopo_ki",
-    "content": "東森寵物大里國光店 打烊之後把狗留在明顯不是裝動物的收納箱裡 狗狗狂叫、一直撞玻璃門，看起來超可憐",
-    "publishedAt": "5d",
-    "publishedAtISO": "2026-03-24T05:16:47.304Z",
-    "likeCount": 48700,
-    "replyCount": 6300,
-    "repostCount": 4400,
-    "shareCount": 20300,
-    "viewCount": 150000,
-    "quoteCount": 230,
-    "mediaType": "photo",
-    "mediaUrls": [
-        { "url": "https://scontent.cdninstagram.com/...", "type": "image" }
-    ],
-    "postUrl": "https://www.threads.com/@popopo_ki/post/DWOlac1D3-Z",
-    "sourceType": "feed",
-    "sourceQuery": "https://www.threads.com/custom_feed/18113589370710265",
-    "scrapedAt": "2026-03-29T05:16:47.304Z",
-    "replies": []
+  "mode": "user",
+  "usernames": ["ponbu", "zuck", "mosseri"],
+  "maxPosts": 50
 }
 ```
 
-單篇貼文模式的 `replies` 欄位會包含留言：
+**🏷️ 追一個月內的 `#寵物友善` 話題**
 
 ```json
 {
-    "replies": [
-        {
-            "author": "user123",
-            "content": "太扯了吧！",
-            "publishedAt": "2d",
-            "likeCount": 340
-        }
-    ]
+  "mode": "hashtag",
+  "keywords": ["#寵物友善"],
+  "dateFrom": "1 month",
+  "maxPosts": 200
 }
 ```
 
-## 費用大約多少？
+**🔎 過去 7 天講「台積電」的最新貼文**
 
-本 Actor 使用 Playwright 無頭瀏覽器來渲染 Threads 頁面。參考費用：
+```json
+{
+  "mode": "search",
+  "keywords": ["台積電", "護國神山"],
+  "searchSort": "recent",
+  "dateFrom": "7 days",
+  "maxPosts": 100
+}
+```
 
-| 使用情境 | 貼文數 | 預估費用 |
-|----------|------:|-------:|
-| 快速搜尋 | 10 | ~$0.05 |
-| 單一 feed，50 篇 | 50 | ~$0.10 |
-| 5 個關鍵字，各 50 篇 | 250 | ~$0.50 |
-| 大批量，10 個來源 | 500 | ~$1.00 |
+**💬 單篇爆文 + 留言**
 
-費用取決於來源數量和捲動深度，每個來源需要一次瀏覽器頁面載入。
+```json
+{
+  "mode": "post",
+  "postUrls": ["https://www.threads.com/@ponbu/post/DWOlac1D3-Z"]
+}
+```
 
-## 應用場景
+**📋 懶人模式：一次貼 80 個 KOL 帳號**
 
-- **社群輿情監控** — 追蹤品牌、競品或產業在 Threads 上的討論
-- **趨勢追蹤** — 追蹤 hashtag 的熱度和互動變化
-- **內容研究** — 找出你的領域中表現最好的貼文，制定內容策略
-- **競品分析** — 分析競爭對手的互動數據和發文模式
-- **KOL 監控** — 追蹤特定用戶的發文內容和互動趨勢
-- **留言分析** — 深入分析特定貼文的留言回覆情緒和趨勢
-- **學術研究** — 收集公開社群媒體資料做研究分析
-- **潛在客戶開發** — 發掘你市場中的活躍創作者和社群
+直接把 Google Sheet / Excel 那一整欄 Ctrl+C → 貼到 `bulkUsernames` 就好，不用一個一個點「新增」。
 
-## 整合方式
+**Console 表單的填法：一行一個，按 Enter 換行，不要加引號、不要用逗號。** 長這樣：
 
-可透過程式取得資料，或串接到現有工作流程：
+```
+ponbu
+zuck
+mosseri
+threadsapp
+taylornikolai
+```
 
-- **Apify API** — 用任何程式語言取得 JSON 結果
-- **Python / JavaScript SDK** — 使用 Apify 客戶端套件
-- **Webhooks** — 執行完成時自動通知
-- **Zapier / Make / n8n** — 不寫程式也能建立資料管線
-- **Google Sheets** — 直接匯出到試算表
-- **排程執行** — 設定定時抓取，任意間隔
+如果是走 API 呼叫（不是 Console 表單），`bulkUsernames` 是一個字串，裡面用 `\n` 換行：
+
+```json
+{
+  "mode": "user",
+  "bulkUsernames": "ponbu\nzuck\nmosseri\nthreadsapp\ntaylornikolai",
+  "maxPosts": 20
+}
+```
+
+---
+
+## 幾個要注意的地方
+
+- **`maxPosts` 是上限不是保證**。如果那個帳號本來就沒幾篇、或那個 hashtag 很冷，抓出來就會少於你設的數字。爬蟲連續 5 次捲不到新東西就會自己停，不會傻傻跑整場。
+- **相對日期是執行當下算的**。`"7 days"` 今天跑跟明天跑會得到不同的 `dateFrom`，這對排程任務很好用（每天抓「最近一週」就設一次、永遠對）。
+- **Threads 顯示的大數字是簡寫**（像 `12.5K`、`1.7M`），爬蟲會幫你換算成整數，所以 `12.5K` 會變 `12500`，不是精準的真實值。這點 Threads 自己也沒給精確數字，沒辦法。
+- **留言只有 `post` 模式才會抓**，每篇最多抓前 ~20 則，用來看風向夠用、但不適合拿去做完整留言情緒分析。
+- **串文會自動合併**。那種「1/」、「2/」一路接下去的多段貼文會被併成同一筆，每段變成 `threadParts[]` 裡的元素，你不會看到 7 段同主題被當成 7 筆個別貼文。
+- **不用登入 = 只抓得到公開內容**。鎖帳號的、需要追蹤才能看的貼文，這隻看不到，請不要 Issue 說為什麼抓不到你前男友的限動。
+
+---
 
 ## 常見問題
 
-### 抓取 Threads 資料合法嗎？
+**Q: 帳號要加 `@` 嗎？要貼整串網址嗎？**
+都不用。直接 `ponbu` 就好。有加 `@` 會自動去掉，貼舊版 `profileUrls` 整串網址的舊用戶也會自動遷移，現有 schedule 不會爛掉。
 
-本 Actor 只收集公開可見的資料，不會存取私人帳號、繞過登入牆，也不會收集超出未登入訪客可見範圍的個人資料。請確保你的使用情境符合相關法規及 Meta 服務條款。
+**Q: 我設 `maxPosts: 100` 但只抓到 60 篇，是不是壞了？**
+八成不是，是那個來源本來就沒那麼多可見貼文。看 run log 裡的 `totalItems` 和 `in date range` 的數字就知道爬蟲是不是有正常工作。如果你 search 的是熱門詞但每次都只回 20 篇以下，再來開 Issue。
 
-### 需要 Threads 帳號嗎？
+**Q: 為什麼有些欄位是 `null` 或 `0`？**
+Threads 自己就沒給。觀看數（`viewCount`）特別明顯，只有公開且互動夠高的帳號才會顯示；引用數（`quoteCount`）也會依貼文類型時有時無。這是資料缺失不是 silent failure，該有的欄位都會出現，只是值是空的。
 
-不需要。本 Actor 完全不需要任何登入或認證，只存取公開頁面。
+**Q: `dateFrom` / `dateTo` 對每個 mode 都有效嗎？**
+技術上每個 mode 都會套日期過濾，但只有 `search`、`hashtag`、`user` 三個模式有意義。`post` 模式你給的是確定的網址，不會被日期篩掉。`feed` 模式會篩，但取決於那個 feed 本身怎麼排序。
 
-### 為什麼互動數字是近似值？
+**Q: 可以匯出哪些格式？**
+JSON、CSV、Excel、XML、HTML table — Apify dataset 標準的幾種都有，可以從 Console 下載，或接 Apify API / Python / JavaScript SDK。串 Zapier、Make、n8n、Google Sheets 也都行。
 
-Threads 會以縮寫形式顯示大數字（例如「1.7K」、「12.5K」），Actor 會將這些轉換為數值，可能與精確數字略有出入。
+---
 
-### 可以抓留言內容嗎？
+## 跟官方 Threads API 的差別
 
-可以！使用 `postUrls` 輸入單篇貼文網址，Actor 會自動抓取該篇貼文的留言回覆（每篇最多 20 則）。留言資料包含作者、內容、時間和讚數。
+Meta 有出[官方 Threads API](https://developers.facebook.com/docs/threads)，但限制很硬：
 
-### 可以只抓最新的貼文嗎？
+- 只能讀**你自己的帳號**或**授權給你的帳號**的資料 — 想追競品、追 KOL、追公眾話題？官方 API 一律不給。
+- 要跑 OAuth、要申請 Facebook Developer 帳號、發布類應用還要過審。
+- Rate limit 跟端點覆蓋度比「一個沒登入的瀏覽器看得到的東西」還窄。
 
-可以。使用 `searchSort: "recent"` 來按最新排序搜尋結果，或搭配 `dateFrom` / `dateTo` 篩選特定日期範圍的貼文。
+如果你的用途是公開資料分析（輿情、趨勢、競品、社群研究），走 scraper 快很多。如果你是要發文 / 管理自己帳號 / 跑自動化回覆，那就乖乖用官方 API。
 
-### 支援哪些語言？
+---
 
-本 Actor 可處理任何語言的 Threads 內容。互動按鈕標籤目前以英文偵測（Like、Comment、Repost、Share）。
+## 免責聲明
 
-## 技術細節
+本爬蟲只收集**公開可見**的 Threads 資料，不會存取私人帳號、不會繞過登入牆、不會蒐集一個沒登入的訪客看不到的個人資料。用途記得自己評估是否符合當地法規（GDPR、CCPA、個資法）跟 Meta 的服務條款。拿去做正經研究、品牌監控、學術分析都 OK，拿去做騷擾、垃圾訊息、未授權資料轉售就別鬧了。
 
-- **執行環境**：Playwright 無頭瀏覽器（Chromium）
-- **同時處理數**：一次一個瀏覽器頁面（遵守 Threads 速率限制）
-- **導覽方式**：等待網路閒置 + 可設定的捲動深度
-- **擷取策略**：三層 DOM 選擇器策略，針對不同頁面排版提供回退方案
-- **時間標準化**：自動將 Threads 的相對時間（如「5d」）和日期轉換為 ISO 8601 格式
-- **媒體偵測**：自動辨識貼文媒體類型（純文字、圖片、影片、輪播）
-- **錯誤處理**：當找不到貼文時自動儲存除錯截圖
+---
 
-## 更新日誌
-
-- **v0.3** — 新增用戶頁面抓取、單篇貼文 + 留言抓取、媒體連結與類型擷取、時間標準化、搜尋排序、日期範圍篩選、觀看數和引用數、使用分析
-- **v0.2** — 新增關鍵字搜尋與 hashtag 標籤抓取模式；新增互動數據；新增 dataset schema
-- **v0.1** — 首次發佈，支援自訂 feed 抓取
+*Threads 爬蟲 · Meta Threads 資料抓取 · Threads 貼文擷取 · Threads 關鍵字搜尋 · Threads 標籤抓取 · Threads 用戶主頁 · Threads 留言抓取 · Threads 自訂動態 · 輿情監控 · 品牌監控 · 競品分析 · KOL 追蹤 · 社群聆聽 · 網紅行銷數據 · 台灣 Threads · Threads API 替代方案*

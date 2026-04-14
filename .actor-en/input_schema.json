@@ -1,0 +1,111 @@
+{
+    "title": "Threads Scraper — Posts, Profiles, Hashtag & Keyword Search",
+    "type": "object",
+    "schemaVersion": 1,
+    "properties": {
+        "mode": {
+            "title": "🎯 Mode",
+            "type": "string",
+            "description": "What do you want to scrape? Pick a mode and fill in the matching section below.",
+            "editor": "select",
+            "enum": ["user", "hashtag", "search", "post", "feed"],
+            "enumTitles": [
+                "👤 User profiles — by username",
+                "🏷️ Hashtag / topic",
+                "🔎 Keyword search",
+                "💬 Single post + replies",
+                "📰 Custom feed URL"
+            ],
+            "default": "user",
+            "prefill": "user",
+            "sectionCaption": "🎯 Mode"
+        },
+
+        "usernames": {
+            "title": "👤 Usernames",
+            "type": "array",
+            "description": "Plain Threads usernames (no @, no URL). Example: zuck, mosseri. Used when Mode = User.",
+            "editor": "stringList",
+            "items": { "type": "string" },
+            "uniqueItems": true,
+            "maxItems": 100,
+            "prefill": ["zuck"],
+            "sectionCaption": "👤 User Mode"
+        },
+        "bulkUsernames": {
+            "title": "📋 Bulk Usernames (paste)",
+            "type": "string",
+            "description": "**One username per line**, press Enter between each. **No quotes, no commas.** Example:\n\n```\nzuck\nmosseri\nfinkd\n```\n\nYou can copy a column straight from Google Sheets or Excel. Merged into the Usernames list at runtime.",
+            "editor": "textarea"
+        },
+
+        "keywords": {
+            "title": "🏷️ Keywords / Tags",
+            "type": "array",
+            "description": "Keywords for Search mode, or hashtags for Hashtag mode (leading # optional). Example: AI news, #寵物友善.",
+            "editor": "stringList",
+            "items": { "type": "string" },
+            "uniqueItems": true,
+            "maxItems": 100,
+            "sectionCaption": "🏷️ Hashtag / Keyword Mode"
+        },
+        "bulkKeywords": {
+            "title": "📋 Bulk Keywords (paste)",
+            "type": "string",
+            "description": "**One keyword or hashtag per line**, press Enter between each. **No quotes, no commas.** Example:\n\n```\nLLM agents\nvibe coding\n#AI\n```\n\nMerged into the Keywords list at runtime.",
+            "editor": "textarea"
+        },
+        "searchSort": {
+            "title": "🔀 Search Sort",
+            "type": "string",
+            "description": "Sort order for keyword search results. Only applies to Mode = Search.",
+            "editor": "select",
+            "enum": ["top", "recent"],
+            "enumTitles": ["Top (default)", "Recent"],
+            "default": "top"
+        },
+
+        "dateFrom": {
+            "title": "📅 Date From",
+            "type": "string",
+            "description": "Earliest post date. Accepts YYYY-MM-DD or a relative expression like \"7 days\", \"1 month\".",
+            "editor": "datepicker",
+            "sectionCaption": "📅 Date Range (search / hashtag modes)"
+        },
+        "dateTo": {
+            "title": "📅 Date To",
+            "type": "string",
+            "description": "Latest post date. Accepts YYYY-MM-DD or a relative expression.",
+            "editor": "datepicker"
+        },
+
+        "postUrls": {
+            "title": "💬 Post URLs",
+            "type": "array",
+            "description": "Full Threads post URLs. Used when Mode = Post. Example: https://www.threads.com/@user/post/ABC123.",
+            "editor": "stringList",
+            "items": { "type": "string" },
+            "uniqueItems": true,
+            "sectionCaption": "💬 Post / Feed Modes"
+        },
+        "feedUrls": {
+            "title": "📰 Feed URLs",
+            "type": "array",
+            "description": "Threads custom feed URLs. Used when Mode = Feed. Example: https://www.threads.com/custom_feed/18113589370710265.",
+            "editor": "stringList",
+            "items": { "type": "string" },
+            "uniqueItems": true
+        },
+
+        "maxPosts": {
+            "title": "📊 Max Posts",
+            "type": "integer",
+            "description": "Maximum posts to scrape per source. Higher = more billable results ($0.005 each). Scrolling is auto-managed.",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 500,
+            "sectionCaption": "⚙️ General Settings"
+        }
+    },
+    "required": []
+}

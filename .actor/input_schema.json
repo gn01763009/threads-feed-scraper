@@ -1,87 +1,110 @@
 {
-    "title": "Threads Scraper — Search, Posts, Profiles, Replies & Feeds",
+    "title": "Meta Threads 爬蟲 — 貼文、用戶、標籤與關鍵字",
     "type": "object",
     "schemaVersion": 1,
     "properties": {
-        "feedUrls": {
-            "title": "Feed URLs",
+        "mode": {
+            "title": "🎯 模式",
+            "type": "string",
+            "description": "要抓什麼?選一個模式,下面對應的欄位填一下就好。",
+            "editor": "select",
+            "enum": ["user", "hashtag", "search", "post", "feed"],
+            "enumTitles": [
+                "👤 用戶主頁 — 依帳號抓",
+                "🏷️ 標籤 / 話題",
+                "🔎 關鍵字搜尋",
+                "💬 單篇貼文 + 留言",
+                "📰 自訂動態 feed 網址"
+            ],
+            "default": "user",
+            "prefill": "user",
+            "sectionCaption": "🎯 模式"
+        },
+
+        "usernames": {
+            "title": "👤 帳號列表",
             "type": "array",
-            "description": "Threads custom feed URLs (e.g. https://www.threads.com/custom_feed/18113589370710265). Optional if searchKeywords or searchTags are provided.",
-            "editor": "stringList",
-            "items": {
-                "type": "string"
-            }
-        },
-        "searchKeywords": {
-            "title": "Search Keywords",
-            "type": "array",
-            "description": "Keywords to search on Threads (e.g. \"寵物醫療\", \"AI news\"). Results come from threads.com/search.",
-            "editor": "stringList",
-            "items": {
-                "type": "string"
-            },
-            "prefill": ["AI news"]
-        },
-        "searchTags": {
-            "title": "Tags / Topics",
-            "type": "array",
-            "description": "Hashtags or topics to search on Threads (e.g. \"#寵物友善\", \"tech\"). Leading # is optional.",
-            "editor": "stringList",
-            "items": {
-                "type": "string"
-            },
-            "prefill": ["tech"]
-        },
-        "maxPosts": {
-            "title": "Max Posts",
-            "type": "integer",
-            "description": "Maximum number of posts to scrape per source",
-            "default": 50,
-            "minimum": 1,
-            "maximum": 200
-        },
-        "scrollCount": {
-            "title": "Scroll Count",
-            "type": "integer",
-            "description": "Number of times to scroll down to load more posts",
-            "default": 5,
-            "minimum": 1,
-            "maximum": 20
-        },
-        "profileUrls": {
-            "title": "Profile URLs",
-            "type": "array",
-            "description": "Threads profile URLs to scrape posts from (e.g. https://www.threads.com/@zuck). Leading @ is optional.",
+            "description": "Threads 純帳號(不用加 @ 也不用貼網址)。例如:ponbu、zuck。用戶模式用這個欄位。",
             "editor": "stringList",
             "items": { "type": "string" },
-            "prefill": ["https://www.threads.com/@zuck"]
+            "uniqueItems": true,
+            "maxItems": 100,
+            "prefill": ["zuck"],
+            "sectionCaption": "👤 用戶模式"
         },
-        "postUrls": {
-            "title": "Post URLs",
+        "bulkUsernames": {
+            "title": "📋 批量貼帳號",
+            "type": "string",
+            "description": "**一行一個帳號**,按 Enter 換行。**不要加引號、不要用逗號分隔。** 範例:\n\n```\nponbu\nzuck\nmosseri\n```\n\n直接從 Google Sheet / Excel 複製一整欄貼進來最快。執行時會自動併進上面的「帳號列表」。",
+            "editor": "textarea"
+        },
+
+        "keywords": {
+            "title": "🏷️ 關鍵字 / 標籤",
             "type": "array",
-            "description": "Individual Threads post URLs to scrape with replies (e.g. https://www.threads.com/@user/post/ABC123).",
+            "description": "搜尋模式的關鍵字,或標籤模式的 hashtag(開頭 # 可有可無)。例如:AI news、#寵物友善、台積電。",
             "editor": "stringList",
-            "items": { "type": "string" }
+            "items": { "type": "string" },
+            "uniqueItems": true,
+            "maxItems": 100,
+            "sectionCaption": "🏷️ 標籤 / 關鍵字模式"
+        },
+        "bulkKeywords": {
+            "title": "📋 批量貼關鍵字",
+            "type": "string",
+            "description": "**一行一個關鍵字或 hashtag**,按 Enter 換行。**不要加引號、不要用逗號分隔。** 範例:\n\n```\n台積電\n護國神山\n#AI\n```\n\n執行時會自動併進上面的「關鍵字 / 標籤」。",
+            "editor": "textarea"
         },
         "searchSort": {
-            "title": "Search Sort",
+            "title": "🔀 搜尋排序",
             "type": "string",
-            "description": "Sort order for search results. Only applies to searchKeywords.",
+            "description": "關鍵字搜尋的排序方式,只有「搜尋」模式會吃這個設定。",
+            "editor": "select",
             "enum": ["top", "recent"],
-            "enumTitles": ["Top (default)", "Recent"],
+            "enumTitles": ["熱門 (預設)", "最新"],
             "default": "top"
         },
+
         "dateFrom": {
-            "title": "Date From",
+            "title": "📅 起始日期",
             "type": "string",
-            "description": "Filter posts from this date (YYYY-MM-DD). Posts before this date are excluded.",
-            "editor": "textfield"
+            "description": "最早的貼文日期。可填 YYYY-MM-DD 絕對日期,或相對表示法:「7 days」、「1 month」、「2 weeks」。",
+            "editor": "datepicker",
+            "sectionCaption": "📅 日期範圍 (搜尋 / 標籤模式)"
         },
         "dateTo": {
-            "title": "Date To",
+            "title": "📅 結束日期",
             "type": "string",
-            "description": "Filter posts until this date (YYYY-MM-DD). Posts after this date are excluded.",
-            "editor": "textfield"
+            "description": "最晚的貼文日期。格式同起始日期。",
+            "editor": "datepicker"
+        },
+
+        "postUrls": {
+            "title": "💬 貼文網址",
+            "type": "array",
+            "description": "Threads 貼文完整網址,會一併抓留言。例如:https://www.threads.com/@user/post/ABC123。",
+            "editor": "stringList",
+            "items": { "type": "string" },
+            "uniqueItems": true,
+            "sectionCaption": "💬 貼文 / 動態模式"
+        },
+        "feedUrls": {
+            "title": "📰 動態 feed 網址",
+            "type": "array",
+            "description": "Threads 自訂 feed 網址。例如:https://www.threads.com/custom_feed/18113589370710265。",
+            "editor": "stringList",
+            "items": { "type": "string" },
+            "uniqueItems": true
+        },
+
+        "maxPosts": {
+            "title": "📊 最多抓幾篇",
+            "type": "integer",
+            "description": "每個來源最多抓幾篇貼文。越多費用越高 (每筆 $0.005)。捲動次數會自動算,不用手動調。",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 500,
+            "sectionCaption": "⚙️ 一般設定"
         }
     },
     "required": []
