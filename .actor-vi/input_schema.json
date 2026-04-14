@@ -1,0 +1,111 @@
+{
+    "title": "Threads Scraper — Bài viết, Hồ sơ, Hashtag & Tìm kiếm từ khóa",
+    "type": "object",
+    "schemaVersion": 1,
+    "properties": {
+        "mode": {
+            "title": "🎯 Chế độ",
+            "type": "string",
+            "description": "Bạn muốn scrape gì? Chọn một chế độ và điền vào phần tương ứng bên dưới.",
+            "editor": "select",
+            "enum": ["user", "hashtag", "search", "post", "feed"],
+            "enumTitles": [
+                "👤 Hồ sơ người dùng — theo username",
+                "🏷️ Hashtag / chủ đề",
+                "🔎 Tìm kiếm từ khóa",
+                "💬 Bài viết đơn + phản hồi",
+                "📰 URL feed tùy chỉnh"
+            ],
+            "default": "user",
+            "prefill": "user",
+            "sectionCaption": "🎯 Chế độ"
+        },
+
+        "usernames": {
+            "title": "👤 Danh sách username",
+            "type": "array",
+            "description": "Username Threads thuần (không cần @, không cần URL). Ví dụ: zuck, mosseri. Dùng khi Chế độ = User.",
+            "editor": "stringList",
+            "items": { "type": "string" },
+            "uniqueItems": true,
+            "maxItems": 100,
+            "prefill": ["zuck"],
+            "sectionCaption": "👤 Chế độ Người dùng"
+        },
+        "bulkUsernames": {
+            "title": "📋 Dán username hàng loạt",
+            "type": "string",
+            "description": "**Mỗi dòng một username**, nhấn Enter giữa các dòng. **Không dấu nháy, không dấu phẩy.** Ví dụ:\n\n```\nzuck\nmosseri\nfinkd\n```\n\nBạn có thể copy một cột từ Google Sheets / Excel và dán thẳng vào đây. Sẽ được gộp vào danh sách Username khi chạy.",
+            "editor": "textarea"
+        },
+
+        "keywords": {
+            "title": "🏷️ Từ khóa / Tag",
+            "type": "array",
+            "description": "Từ khóa cho chế độ Tìm kiếm, hoặc hashtag cho chế độ Hashtag (dấu # ở đầu tùy chọn). Ví dụ: tin AI, #côngnghệ.",
+            "editor": "stringList",
+            "items": { "type": "string" },
+            "uniqueItems": true,
+            "maxItems": 100,
+            "sectionCaption": "🏷️ Chế độ Hashtag / Từ khóa"
+        },
+        "bulkKeywords": {
+            "title": "📋 Dán từ khóa hàng loạt",
+            "type": "string",
+            "description": "**Mỗi dòng một từ khóa hoặc hashtag**, nhấn Enter giữa các dòng. **Không dấu nháy, không dấu phẩy.** Ví dụ:\n\n```\nLLM agent\nvibe coding\n#AI\n```\n\nSẽ được gộp vào danh sách Từ khóa khi chạy.",
+            "editor": "textarea"
+        },
+        "searchSort": {
+            "title": "🔀 Sắp xếp tìm kiếm",
+            "type": "string",
+            "description": "Thứ tự sắp xếp kết quả tìm kiếm từ khóa. Chỉ áp dụng cho Chế độ = Tìm kiếm.",
+            "editor": "select",
+            "enum": ["top", "recent"],
+            "enumTitles": ["Top (mặc định)", "Mới nhất"],
+            "default": "top"
+        },
+
+        "dateFrom": {
+            "title": "📅 Ngày bắt đầu",
+            "type": "string",
+            "description": "Ngày cũ nhất của bài viết. Chấp nhận YYYY-MM-DD hoặc cách biểu đạt tương đối như \"7 days\", \"1 month\".",
+            "editor": "datepicker",
+            "sectionCaption": "📅 Khoảng ngày (chế độ tìm kiếm / hashtag)"
+        },
+        "dateTo": {
+            "title": "📅 Ngày kết thúc",
+            "type": "string",
+            "description": "Ngày mới nhất của bài viết. Cùng định dạng với Ngày bắt đầu.",
+            "editor": "datepicker"
+        },
+
+        "postUrls": {
+            "title": "💬 URL bài viết",
+            "type": "array",
+            "description": "URL đầy đủ của bài viết Threads. Dùng khi Chế độ = Post. Ví dụ: https://www.threads.com/@user/post/ABC123.",
+            "editor": "stringList",
+            "items": { "type": "string" },
+            "uniqueItems": true,
+            "sectionCaption": "💬 Chế độ Bài viết / Feed"
+        },
+        "feedUrls": {
+            "title": "📰 URL feed",
+            "type": "array",
+            "description": "URL feed tùy chỉnh của Threads. Dùng khi Chế độ = Feed. Ví dụ: https://www.threads.com/custom_feed/18113589370710265.",
+            "editor": "stringList",
+            "items": { "type": "string" },
+            "uniqueItems": true
+        },
+
+        "maxPosts": {
+            "title": "📊 Số bài tối đa",
+            "type": "integer",
+            "description": "Số bài viết tối đa trên mỗi nguồn. Càng nhiều thì càng nhiều kết quả tính phí ($0.005 mỗi bài). Cuộn trang được quản lý tự động.",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 500,
+            "sectionCaption": "⚙️ Cài đặt chung"
+        }
+    },
+    "required": []
+}

@@ -26,7 +26,7 @@ import { resolve } from 'node:path';
 
 import { syncActorMetadata } from './sync-actor-metadata.ts';
 
-const SUPPORTED_LOCALES = ['zh-tw', 'en', 'pt-br', 'ja'] as const;
+const SUPPORTED_LOCALES = ['zh-tw', 'en', 'pt-br', 'ja', 'vi'] as const;
 const DEFAULT_LOCALE = 'zh-tw';
 const SWAPPED_PATHS = ['.actor', 'README.md'];
 const STRAY_CLEANUP_PATHS = ['.actor/README.md'];

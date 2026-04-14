@@ -1,0 +1,46 @@
+{
+    "actorSpecification": 1,
+    "fields": {},
+    "views": {
+        "overview": {
+            "title": "Tổng quan",
+            "transformation": {
+                "fields": [
+                    "author",
+                    "content",
+                    "publishedAt",
+                    "likeCount",
+                    "replyCount",
+                    "repostCount",
+                    "shareCount",
+                    "viewCount",
+                    "quoteCount",
+                    "mediaType",
+                    "publishedAtISO",
+                    "postUrl",
+                    "sourceType",
+                    "sourceQuery"
+                ]
+            },
+            "display": {
+                "component": "table",
+                "properties": {
+                    "author": { "label": "Tác giả", "format": "text" },
+                    "content": { "label": "Nội dung", "format": "text" },
+                    "publishedAt": { "label": "Đăng lúc", "format": "text" },
+                    "likeCount": { "label": "Lượt thích", "format": "number" },
+                    "replyCount": { "label": "Phản hồi", "format": "number" },
+                    "repostCount": { "label": "Repost", "format": "number" },
+                    "shareCount": { "label": "Chia sẻ", "format": "number" },
+                    "viewCount": { "label": "Lượt xem", "format": "number" },
+                    "quoteCount": { "label": "Trích dẫn", "format": "number" },
+                    "mediaType": { "label": "Loại media", "format": "text" },
+                    "publishedAtISO": { "label": "Đăng lúc (ISO)", "format": "date" },
+                    "postUrl": { "label": "URL bài viết", "format": "link" },
+                    "sourceType": { "label": "Nguồn", "format": "text" },
+                    "sourceQuery": { "label": "Truy vấn", "format": "text" }
+                }
+            }
+        }
+    }
+}

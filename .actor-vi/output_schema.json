@@ -1,0 +1,11 @@
+{
+    "actorOutputSchemaVersion": 1,
+    "title": "Kết quả Threads Scraper",
+    "properties": {
+        "dataset": {
+            "type": "string",
+            "title": "Bài viết đã scrape",
+            "template": "{{links.apiDefaultDatasetUrl}}/items"
+        }
+    }
+}
