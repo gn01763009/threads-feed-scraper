@@ -3,7 +3,7 @@
 	"actorSpecification": 1,
 	"name": "threads-scraper-vi",
 	"title": "Threads Scraper — Bài viết, Hồ sơ, Hashtag & Tìm kiếm từ khóa",
-	"description": "Năm chế độ scraping Threads trong một actor: hồ sơ người dùng, hashtag, tìm kiếm từ khóa, bài viết đơn lẻ kèm phản hồi, và feed tùy chỉnh. Dán hàng loạt tối đa 100 username hoặc từ khóa, bộ lọc ngày tương đối, chỉ số tương tác, timestamp ISO. Không cần đăng nhập. $0.005 mỗi kết quả.",
+	"description": "Năm chế độ trích xuất Threads trong một actor: hồ sơ người dùng, hashtag, tìm kiếm từ khóa, bài viết đơn lẻ kèm phản hồi, và feed tùy chỉnh. Dán hàng loạt tối đa 100 username hoặc từ khóa, bộ lọc ngày tương đối, chỉ số tương tác, timestamp ISO. Không cần đăng nhập. $0.005 mỗi kết quả.",
 	"version": "1.0",
 	"buildTag": "latest",
 	"meta": {
