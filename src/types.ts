@@ -1,3 +1,5 @@
+export type Mode = 'user' | 'hashtag' | 'search' | 'post' | 'feed';
+
 export type SourceType = 'feed' | 'search' | 'tag' | 'profile' | 'post';
 
 export type SearchSort = 'top' | 'recent';
@@ -45,15 +47,40 @@ export interface ThreadsPost {
     threadParts?: ThreadPart[];
 }
 
-export interface InputSchema {
-    feedUrls?: string[];
-    searchKeywords?: string[];
-    searchTags?: string[];
-    profileUrls?: string[];
+/**
+ * Raw input as received from Apify. All fields optional; legacy field
+ * names are accepted for backwards-compatibility with v0.3 saved inputs.
+ */
+export interface RawInput {
+    mode?: Mode;
+    usernames?: string[];
+    bulkUsernames?: string;
+    keywords?: string[];
+    bulkKeywords?: string;
     postUrls?: string[];
-    maxPosts?: number;
-    scrollCount?: number;
+    feedUrls?: string[];
     searchSort?: SearchSort;
     dateFrom?: string;
     dateTo?: string;
+    maxPosts?: number;
+    scrollCount?: number;
+
+    // Legacy v0.3 fields — auto-migrated in validation
+    profileUrls?: string[];
+    searchKeywords?: string[];
+    searchTags?: string[];
+}
+
+/** Normalized, validated input ready for the crawler. */
+export interface NormalizedInput {
+    mode: Mode;
+    usernames: string[];
+    keywords: string[];
+    postUrls: string[];
+    feedUrls: string[];
+    searchSort?: SearchSort;
+    dateFrom?: string;
+    dateTo?: string;
+    maxPosts: number;
+    scrollCount: number;
 }

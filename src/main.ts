@@ -3,9 +3,9 @@ import { PlaywrightCrawler, Dataset } from '@crawlee/playwright';
 import { getExtractScript, DEBUG_SCRIPT } from './extract.js';
 import { getReplyExtractScript } from './replies.js';
 import { validateInput } from './validation.js';
-import { buildSearchUrl, buildTagUrl, buildProfileUrl, buildPostUrl } from './urls.js';
+import { buildSearchUrl, buildTagUrl, buildProfileUrl } from './urls.js';
 import { mergeThreadChains } from './threads.js';
-import type { InputSchema, ThreadsPost, ThreadsReply, SourceType } from './types.js';
+import type { NormalizedInput, RawInput, ThreadsPost, ThreadsReply, SourceType } from './types.js';
 
 const HYDRATION_DELAY_MS = 3_000;
 const SCROLL_DELAY_MS = 2_000;
@@ -19,9 +19,9 @@ interface RequestUserData {
 
 await Actor.init();
 
-const rawInput = await Actor.getInput<InputSchema>();
+const rawInput = await Actor.getInput<RawInput>();
 
-let input: InputSchema;
+let input: NormalizedInput;
 try {
     input = validateInput(rawInput);
 } catch (err) {
@@ -31,31 +31,17 @@ try {
     throw err; // unreachable, but satisfies TypeScript
 }
 
-const maxPosts = input.maxPosts ?? 50;
-const scrollCount = input.scrollCount ?? 5;
+const { maxPosts, scrollCount, mode } = input;
 let totalItems = 0;
 
-const sources: Array<[string[] | undefined, (q: string) => string, SourceType]> = [
-    [input.feedUrls, (u) => u, 'feed'],
-    [input.searchKeywords, (k) => buildSearchUrl(k, input.searchSort), 'search'],
-    [input.searchTags, buildTagUrl, 'tag'],
-    [input.profileUrls, (u) => u, 'profile'],
-    [input.postUrls, (u) => u, 'post'],
-];
-
-const requests: { url: string; userData: RequestUserData }[] = [];
-for (const [items, buildUrl, sourceType] of sources) {
-    for (const query of items ?? []) {
-        requests.push({ url: buildUrl(query), userData: { sourceType, sourceQuery: query } });
-    }
-}
+const requests: { url: string; userData: RequestUserData }[] = buildRequests(input);
 
 log.info('Starting Threads scraper', {
-    feedUrls: input.feedUrls,
-    searchKeywords: input.searchKeywords,
-    searchTags: input.searchTags,
-    profileUrls: input.profileUrls,
+    mode,
+    usernames: input.usernames,
+    keywords: input.keywords,
     postUrls: input.postUrls,
+    feedUrls: input.feedUrls,
     searchSort: input.searchSort,
     dateFrom: input.dateFrom,
     dateTo: input.dateTo,
@@ -63,6 +49,36 @@ log.info('Starting Threads scraper', {
     maxPosts,
     scrollCount,
 });
+
+function buildRequests(n: NormalizedInput): { url: string; userData: RequestUserData }[] {
+    const out: { url: string; userData: RequestUserData }[] = [];
+    const push = (url: string, sourceType: SourceType, sourceQuery: string) => {
+        out.push({ url, userData: { sourceType, sourceQuery } });
+    };
+
+    switch (n.mode) {
+        case 'user':
+            for (const username of n.usernames) push(buildProfileUrl(username), 'profile', username);
+            break;
+        case 'hashtag':
+            for (const kw of n.keywords) push(buildTagUrl(kw), 'tag', kw);
+            break;
+        case 'search':
+            for (const kw of n.keywords) push(buildSearchUrl(kw, n.searchSort), 'search', kw);
+            break;
+        case 'post':
+            for (const url of n.postUrls) push(url, 'post', url);
+            break;
+        case 'feed':
+            for (const url of n.feedUrls) push(url, 'feed', url);
+            break;
+        default: {
+            const _exhaustive: never = n.mode;
+            throw new Error(`Unhandled mode: ${_exhaustive as string}`);
+        }
+    }
+    return out;
+}
 
 function filterByDateRange(posts: readonly ThreadsPost[]): ThreadsPost[] {
     if (!input.dateFrom && !input.dateTo) return [...posts];
@@ -280,11 +296,12 @@ if (telemetryDatasetId && telemetryToken) {
             queries: requests.map((r) => r.userData.sourceQuery),
             postCount: totalItems,
             requestCount: requests.length,
-            scrollCount: input.scrollCount ?? 5,
-            maxPosts: input.maxPosts ?? 50,
+            mode: input.mode,
+            scrollCount: input.scrollCount,
+            maxPosts: input.maxPosts,
             searchSort: input.searchSort ?? 'top',
             hasDateFilter: !!(input.dateFrom || input.dateTo),
-            actorVersion: '0.3',
+            actorVersion: '1.0',
             timestamp: new Date().toISOString(),
         };
         const res = await fetch(

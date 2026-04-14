@@ -1,0 +1,8 @@
+{
+    "mode": "search",
+    "keywords": ["AI news"],
+    "searchSort": "recent",
+    "dateFrom": "7 days",
+    "maxPosts": 3,
+    "scrollCount": 1
+}

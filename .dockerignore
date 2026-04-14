@@ -16,3 +16,9 @@ node_modules
 
 # dist folder
 dist
+
+# locale deploy script + per-locale listing assets (never shipped in image)
+scripts
+.actor-zh-tw
+.actor-pt-br
+.actor-ja
