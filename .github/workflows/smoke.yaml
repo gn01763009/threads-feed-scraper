@@ -1,0 +1,62 @@
+name: Daily smoke test
+
+# Runs fixture 01-user.json against real Threads to catch UI/DOM changes
+# early. This is the highest-risk failure mode (PLAN §9) because a Threads
+# redesign silently breaks every paying run. On failure, opens a tracking
+# issue labelled "smoke-fail" so it surfaces in the repo dashboard.
+
+on:
+    schedule:
+        # 09:30 Taipei = 01:30 UTC.
+        - cron: '30 1 * * *'
+    workflow_dispatch:
+
+jobs:
+    smoke:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            issues: write
+        steps:
+            - uses: actions/checkout@v6
+
+            - uses: actions/setup-node@v6
+              with:
+                  node-version: 24
+                  cache: npm
+
+            - run: npm ci
+
+            - name: Install Playwright browser
+              run: npx playwright install --with-deps chromium
+
+            - run: npm run build
+
+            - name: Run smoke test
+              run: npm run test:smoke
+
+            - name: Open or update tracking issue on failure
+              if: failure() && github.event_name == 'schedule'
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+              run: |
+                  existing=$(gh issue list --label smoke-fail --state open --json number --jq '.[0].number' || echo '')
+                  body="Daily smoke test failed — Threads UI or extraction pipeline may have broken.
+
+                  Run: $RUN_URL
+                  Fixture: test-inputs/01-user.json (user mode, @zuck)
+
+                  Next steps:
+                  1. Check the failing assertion in the run logs
+                  2. Reproduce locally: npm run test:smoke
+                  3. If Threads DOM changed, update extractors in src/
+                  4. Close this issue once a green run passes"
+                  if [ -n "$existing" ]; then
+                      gh issue comment "$existing" --body "$body"
+                  else
+                      gh issue create \
+                          --title "Smoke test failing: Threads extraction broken" \
+                          --label smoke-fail \
+                          --body "$body"
+                  fi
