@@ -24,10 +24,20 @@ import { execFileSync } from 'node:child_process';
 import { cpSync, existsSync, rmSync } from 'node:fs';
 import { resolve } from 'node:path';
 
+import { syncActorMetadata } from './sync-actor-metadata.ts';
+
 const SUPPORTED_LOCALES = ['zh-tw', 'en', 'pt-br', 'ja'] as const;
 const DEFAULT_LOCALE = 'zh-tw';
 const SWAPPED_PATHS = ['.actor', 'README.md'];
 const STRAY_CLEANUP_PATHS = ['.actor/README.md'];
+
+// Apify Actor IDs per locale. `apify push` only updates the build — it does
+// NOT patch the Store-listing title/description, so we call the metadata sync
+// API after each push. Add new locales here when their Store slot is created.
+const LOCALE_ACTOR_IDS: Partial<Record<Locale, string>> = {
+    'zh-tw': 'gYxIBYI7YR97txviU',
+    en: 'gnvZoX4vwrEze1dos',
+};
 
 type Locale = (typeof SUPPORTED_LOCALES)[number];
 
@@ -79,7 +89,7 @@ function restoreSwappedPaths(repoRoot: string): void {
     }
 }
 
-function main(): void {
+async function main(): Promise<void> {
     const locale = process.argv[2];
     if (!locale || !isLocale(locale)) {
         console.error(`Usage: tsx scripts/push-locale.ts <${SUPPORTED_LOCALES.join('|')}>`);
@@ -116,6 +126,17 @@ function main(): void {
         // --force bypasses interactive prompts (e.g. "actor doesn't exist,
         // create it?") so first-time pushes for new locales work headless.
         run('npx', ['-y', 'apify-cli', 'push', '--force']);
+
+        // Sync Store-listing title/description. Must run BEFORE restore —
+        // syncActorMetadata reads from .actor/actor.json, which is still
+        // the locale-specific copy at this point for non-default locales.
+        const actorId = LOCALE_ACTOR_IDS[locale];
+        if (actorId) {
+            await syncActorMetadata(actorId);
+        } else {
+            console.log(`⚠️  No actor ID mapped for locale "${locale}" — skipping metadata sync.`);
+            console.log(`   Add it to LOCALE_ACTOR_IDS once the Store slot exists.`);
+        }
     } finally {
         if (needsSwap) {
             try {
@@ -129,4 +150,7 @@ function main(): void {
     console.log(`✅ Deployed locale: ${locale}`);
 }
 
-main();
+main().catch((err) => {
+    console.error(err instanceof Error ? err.message : err);
+    process.exit(1);
+});
