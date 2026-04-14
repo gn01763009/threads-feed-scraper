@@ -37,6 +37,9 @@ const STRAY_CLEANUP_PATHS = ['.actor/README.md'];
 const LOCALE_ACTOR_IDS: Partial<Record<Locale, string>> = {
     'zh-tw': 'gYxIBYI7YR97txviU',
     en: 'gnvZoX4vwrEze1dos',
+    'pt-br': 'n8Bf8q0wtO0Pwwxuj',
+    ja: 'NirQxxKuNimRK3Ae4',
+    vi: 'NEziwa5cuMejscm2W',
 };
 
 type Locale = (typeof SUPPORTED_LOCALES)[number];
