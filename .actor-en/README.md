@@ -1,6 +1,17 @@
-# Threads Scraper — Posts, Profiles, Hashtag & Keyword Search
+# Threads Scraper: The All-in-One Data Engine for Meta Threads
 
-A unified Meta Threads scraper for **user profiles**, **hashtag topics**, **keyword search**, **single posts with replies**, and **custom feeds**. No login, no API token, bulk-paste support for up to 100 usernames or keywords at a time, and a flat **$0.005 per result** with no start fee. Built for marketers, researchers, SaaS developers, and social listening teams who need Threads data without wiring up Meta's official API.
+Unlock deep market insights with a unified scraper. No login, no tokens, and no official API restrictions.
+
+---
+
+## 🔥 Why This Scraper?
+
+- Zero Authentication: Skip the OAuth setup and Facebook Developer accounts. No login or API tokens required.
+- Unified Actor: 5 modes in one codebase. Simplify your tech stack and reduce integration maintenance.
+- Massive Scalability: Bulk-paste up to 100 usernames or keywords. Perfect for tracking large KOL lists.
+- Workflow-Ready: Built-in support for relative dates (e.g., "7 days") makes it easy to schedule recurring runs in n8n, Zapier, or Make.
+- Clean, Merged Data: Multi-segment thread posts are automatically stitched into a single record (threadParts[]) for better readability.
+- Cost-Efficient: Flat $0.005 per result with no start fees and smart auto-stop to prevent wasted credits.
 
 ---
 
