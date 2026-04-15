@@ -18,7 +18,7 @@ export function clearDataset(): void {
 }
 
 export function runActor(): string {
-    return execSync('apify run', {
+    return execSync('npx apify-cli run', {
         cwd: PROJECT_ROOT,
         timeout: 120_000,
         encoding: 'utf-8',
