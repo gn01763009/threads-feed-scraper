@@ -128,7 +128,9 @@ async function main(): Promise<void> {
     try {
         // --force bypasses interactive prompts (e.g. "actor doesn't exist,
         // create it?") so first-time pushes for new locales work headless.
-        run('npx', ['-y', 'apify-cli', 'push', '--force']);
+        // Note: use "npx apify-cli" (not "npx -y apify-cli") — the -y flag
+        // triggers a top-level await crash in apify-cli v1.4.x.
+        run('npx', ['apify-cli', 'push', '--force']);
 
         // Sync Store-listing title/description. Must run BEFORE restore —
         // syncActorMetadata reads from .actor/actor.json, which is still
