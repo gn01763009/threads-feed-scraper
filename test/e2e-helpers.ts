@@ -1,12 +1,13 @@
-import { readFileSync, writeFileSync, rmSync, existsSync, readdirSync } from 'fs';
+import { readFileSync, writeFileSync, mkdirSync, rmSync, existsSync, readdirSync } from 'fs';
 import { execSync } from 'child_process';
-import { join } from 'path';
+import { dirname, join } from 'path';
 
 const PROJECT_ROOT = join(import.meta.dirname, '..');
 const INPUT_PATH = join(PROJECT_ROOT, 'storage/key_value_stores/default/INPUT.json');
 const DATASET_DIR = join(PROJECT_ROOT, 'storage/datasets/default');
 
 export function setInput(input: Record<string, unknown>): void {
+    mkdirSync(dirname(INPUT_PATH), { recursive: true });
     writeFileSync(INPUT_PATH, JSON.stringify(input, null, 2));
 }
 
