@@ -26,8 +26,8 @@ try {
     input = validateInput(rawInput);
 } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    log.error(`Input validation failed: ${message}`);
-    await Actor.fail(message);
+    log.warning(`Input validation failed: ${message}. Exiting gracefully — no results to return.`);
+    await Actor.exit();
     throw err; // unreachable, but satisfies TypeScript
 }
 
