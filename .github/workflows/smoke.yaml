@@ -35,6 +35,17 @@ jobs:
             - name: Run smoke test
               run: npm run test:smoke
 
+            - name: Upload actor log on failure
+              if: failure()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: actor-log
+                  path: |
+                      storage/actor.log
+                      storage/datasets/default/
+                      storage/key_value_stores/default/
+                  if-no-files-found: ignore
+
             - name: Open or update tracking issue on failure
               if: failure() && github.event_name == 'schedule'
               env:

@@ -26,8 +26,11 @@ describe('Smoke: Threads still scrapable', { timeout: 180_000 }, () => {
         const fixture = JSON.parse(readFileSync(FIXTURE_PATH, 'utf-8')) as Record<string, unknown>;
         clearDataset();
         setInput(fixture);
-        runActor();
+        const stdout = runActor();
         items = getDatasetItems();
+        if (items.length === 0) {
+            process.stderr.write(`\n[smoke] actor produced 0 items. Full output:\n${stdout}\n`);
+        }
     });
 
     it('extracts at least one post (UI has not broken)', () => {
