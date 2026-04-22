@@ -37,6 +37,42 @@ export function runActor(): string {
     return result.stdout ?? '';
 }
 
+const APIFY_ACTOR_ID = 'claude_code_reviewer~threads-feed-scraper';
+
+export async function runActorOnApifyCloud(
+    input: Record<string, unknown>,
+): Promise<Record<string, unknown>[]> {
+    const token = process.env.APIFY_TOKEN;
+    if (!token) {
+        throw new Error('APIFY_TOKEN env var is required for cloud smoke runs');
+    }
+
+    const url = `https://api.apify.com/v2/acts/${APIFY_ACTOR_ID}/run-sync-get-dataset-items?token=${token}&timeout=150&format=json`;
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(input),
+    });
+
+    const text = await response.text();
+    mkdirSync(dirname(ACTOR_LOG_PATH), { recursive: true });
+    writeFileSync(
+        ACTOR_LOG_PATH,
+        `--- cloud run ---\nstatus: ${response.status}\nactor: ${APIFY_ACTOR_ID}\ninput: ${JSON.stringify(input)}\n--- response (first 4kb) ---\n${text.slice(0, 4096)}\n`,
+    );
+
+    if (!response.ok) {
+        process.stderr.write(`\n[runActorOnApifyCloud] HTTP ${response.status}\n${text.slice(0, 2048)}\n`);
+        throw new Error(`Apify run-sync returned ${response.status}`);
+    }
+
+    const items = JSON.parse(text) as Record<string, unknown>[];
+    if (items.length === 0) {
+        process.stderr.write(`\n[runActorOnApifyCloud] dataset empty. Body:\n${text.slice(0, 2048)}\n`);
+    }
+    return items;
+}
+
 export function getDatasetItems(): Record<string, unknown>[] {
     if (!existsSync(DATASET_DIR)) return [];
     const files = readdirSync(DATASET_DIR).filter(f => f.endsWith('.json')).sort();

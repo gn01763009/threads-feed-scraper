@@ -15,21 +15,25 @@ import { join } from 'node:path';
 
 import { beforeAll, describe, expect, it } from 'vitest';
 
-import { clearDataset, getDatasetItems, runActor, setInput } from './e2e-helpers.js';
+import { clearDataset, getDatasetItems, runActor, runActorOnApifyCloud, setInput } from './e2e-helpers.js';
 
 const FIXTURE_PATH = join(import.meta.dirname, '..', 'test-inputs', '01-user.json');
 
 describe('Smoke: Threads still scrapable', { timeout: 180_000 }, () => {
     let items: Record<string, unknown>[] = [];
 
-    beforeAll(() => {
+    beforeAll(async () => {
         const fixture = JSON.parse(readFileSync(FIXTURE_PATH, 'utf-8')) as Record<string, unknown>;
-        clearDataset();
-        setInput(fixture);
-        const stdout = runActor();
-        items = getDatasetItems();
-        if (items.length === 0) {
-            process.stderr.write(`\n[smoke] actor produced 0 items. Full output:\n${stdout}\n`);
+        if (process.env.SMOKE_USE_CLOUD === '1') {
+            items = await runActorOnApifyCloud(fixture);
+        } else {
+            clearDataset();
+            setInput(fixture);
+            const stdout = runActor();
+            items = getDatasetItems();
+            if (items.length === 0) {
+                process.stderr.write(`\n[smoke] actor produced 0 items. Full output:\n${stdout}\n`);
+            }
         }
     });
 
