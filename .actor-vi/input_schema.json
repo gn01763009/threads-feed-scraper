@@ -42,7 +42,7 @@
         "keywords": {
             "title": "🏷️ Từ khóa / Tag",
             "type": "array",
-            "description": "Từ khóa cho chế độ Tìm kiếm, hoặc hashtag cho chế độ Hashtag (dấu # ở đầu tùy chọn). Ví dụ: tin AI, #côngnghệ.",
+            "description": "Từ khóa cho chế độ Tìm kiếm, hoặc hashtag cho chế độ Hashtag (dấu # ở đầu tùy chọn). Ví dụ: tin AI, #côngnghệ. ⚠️ **Một khái niệm mỗi từ khóa** — Threads xem toàn bộ chuỗi như một cụm từ duy nhất, nên các từ ghép như \"thiền chánh niệm\" sẽ trả về 0 kết quả. Hãy tách thành \"thiền\" + \"chánh niệm\" thành hai từ khóa riêng.",
             "editor": "stringList",
             "items": { "type": "string" },
             "uniqueItems": true,

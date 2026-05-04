@@ -42,7 +42,7 @@
         "keywords": {
             "title": "🏷️ 關鍵字 / 標籤",
             "type": "array",
-            "description": "搜尋模式的關鍵字,或標籤模式的 hashtag(開頭 # 可有可無)。例如:AI news、#寵物友善、台積電。",
+            "description": "搜尋模式的關鍵字,或標籤模式的 hashtag(開頭 # 可有可無)。例如:AI news、#寵物友善、台積電。⚠️ **一個概念一個關鍵字** — Threads 搜尋會把整串當一個詞匹配,複合詞像「冥想正念」會回 0 筆,要拆成「冥想」和「正念」兩個關鍵字分別跑。",
             "editor": "stringList",
             "items": { "type": "string" },
             "uniqueItems": true,

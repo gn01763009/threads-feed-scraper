@@ -42,7 +42,7 @@
         "keywords": {
             "title": "🏷️ Keywords / Tags",
             "type": "array",
-            "description": "Keywords for Search mode, or hashtags for Hashtag mode (leading # optional). Example: AI news, #寵物友善.",
+            "description": "Keywords for Search mode, or hashtags for Hashtag mode (leading # optional). Example: AI news, #寵物友善. ⚠️ **One concept per keyword** — Threads matches the whole string as a single phrase, so combined terms like \"meditation mindfulness\" return 0 results. Split into \"meditation\" + \"mindfulness\" as two separate keywords.",
             "editor": "stringList",
             "items": { "type": "string" },
             "uniqueItems": true,

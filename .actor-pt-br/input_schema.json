@@ -42,7 +42,7 @@
         "keywords": {
             "title": "🏷️ Palavras-chave / Tags",
             "type": "array",
-            "description": "Palavras-chave para o modo Busca, ou hashtags para o modo Hashtag (# inicial opcional). Exemplo: notícias IA, #tecnologia.",
+            "description": "Palavras-chave para o modo Busca, ou hashtags para o modo Hashtag (# inicial opcional). Exemplo: notícias IA, #tecnologia. ⚠️ **Um conceito por palavra-chave** — o Threads trata a string inteira como uma única frase, então termos combinados como \"meditação mindfulness\" retornam 0 resultados. Separe em \"meditação\" + \"mindfulness\" como duas palavras-chave.",
             "editor": "stringList",
             "items": { "type": "string" },
             "uniqueItems": true,

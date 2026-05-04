@@ -266,6 +266,12 @@ const crawler = new PlaywrightCrawler({
             const debugInfo = await page.evaluate(DEBUG_SCRIPT);
             log.warning('No posts found. Page structure:', debugInfo as Record<string, unknown>);
 
+            if (sourceType === 'search') {
+                log.warning(
+                    `Threads 搜尋對「${sourceQuery}」回 0 筆。Threads 把整串當一個詞匹配,如果是複合詞(例如「冥想正念」),拆成單一關鍵字分別跑會比較容易抓到結果(例如「冥想」+「正念」)。`,
+                );
+            }
+
             const screenshotKey = `debug-screenshot-${sourceType}-${Date.now()}`;
             const screenshot = await page.screenshot({ fullPage: false });
             await Actor.setValue(screenshotKey, screenshot, { contentType: 'image/png' });
