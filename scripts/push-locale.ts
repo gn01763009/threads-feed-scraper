@@ -26,7 +26,10 @@ import { resolve } from 'node:path';
 
 import { syncActorMetadata } from './sync-actor-metadata.ts';
 
-const SUPPORTED_LOCALES = ['zh-tw', 'en', 'pt-br', 'ja', 'vi'] as const;
+// `stock-zh` is not a real locale — it's a vertical-positioning variant of
+// the zh-tw build (same Docker code, fintech-targeted metadata). Treated like
+// a locale by the deploy plumbing for code-reuse.
+const SUPPORTED_LOCALES = ['zh-tw', 'en', 'pt-br', 'ja', 'vi', 'stock-zh'] as const;
 const DEFAULT_LOCALE = 'zh-tw';
 const SWAPPED_PATHS = ['.actor', 'README.md'];
 const STRAY_CLEANUP_PATHS = ['.actor/README.md'];
@@ -40,6 +43,8 @@ const LOCALE_ACTOR_IDS: Partial<Record<Locale, string>> = {
     'pt-br': 'n8Bf8q0wtO0Pwwxuj',
     ja: 'NirQxxKuNimRK3Ae4',
     vi: 'NEziwa5cuMejscm2W',
+    // 'stock-zh' actor ID will be filled in after first `apify push`
+    // creates the listing on Apify Store.
 };
 
 type Locale = (typeof SUPPORTED_LOCALES)[number];

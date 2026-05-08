@@ -1,0 +1,88 @@
+{
+    "actorSpecification": 1,
+    "fields": {},
+    "views": {
+        "overview": {
+            "title": "總覽",
+            "transformation": {
+                "fields": [
+                    "author",
+                    "content",
+                    "publishedAt",
+                    "likeCount",
+                    "replyCount",
+                    "repostCount",
+                    "shareCount",
+                    "viewCount",
+                    "quoteCount",
+                    "mediaType",
+                    "publishedAtISO",
+                    "postUrl",
+                    "sourceType",
+                    "sourceQuery"
+                ]
+            },
+            "display": {
+                "component": "table",
+                "properties": {
+                    "author": {
+                        "label": "作者",
+                        "format": "text"
+                    },
+                    "content": {
+                        "label": "內容",
+                        "format": "text"
+                    },
+                    "publishedAt": {
+                        "label": "發佈時間",
+                        "format": "text"
+                    },
+                    "likeCount": {
+                        "label": "讚數",
+                        "format": "number"
+                    },
+                    "replyCount": {
+                        "label": "回覆數",
+                        "format": "number"
+                    },
+                    "repostCount": {
+                        "label": "轉發數",
+                        "format": "number"
+                    },
+                    "shareCount": {
+                        "label": "分享數",
+                        "format": "number"
+                    },
+                    "viewCount": {
+                        "label": "觀看數",
+                        "format": "number"
+                    },
+                    "quoteCount": {
+                        "label": "引用數",
+                        "format": "number"
+                    },
+                    "mediaType": {
+                        "label": "媒體類型",
+                        "format": "text"
+                    },
+                    "publishedAtISO": {
+                        "label": "發佈時間 (ISO)",
+                        "format": "date"
+                    },
+                    "postUrl": {
+                        "label": "貼文連結",
+                        "format": "link"
+                    },
+                    "sourceType": {
+                        "label": "來源模式",
+                        "format": "text"
+                    },
+                    "sourceQuery": {
+                        "label": "查詢條件",
+                        "format": "text"
+                    }
+                }
+            }
+        }
+    }
+}
