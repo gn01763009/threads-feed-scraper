@@ -43,8 +43,7 @@ const LOCALE_ACTOR_IDS: Partial<Record<Locale, string>> = {
     'pt-br': 'n8Bf8q0wtO0Pwwxuj',
     ja: 'NirQxxKuNimRK3Ae4',
     vi: 'NEziwa5cuMejscm2W',
-    // 'stock-zh' actor ID will be filled in after first `apify push`
-    // creates the listing on Apify Store.
+    'stock-zh': '2FBzCBI8jc8uYwAGW',
 };
 
 type Locale = (typeof SUPPORTED_LOCALES)[number];
