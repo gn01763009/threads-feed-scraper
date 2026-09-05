@@ -72,31 +72,29 @@
 
 - `postId`、`postUrl`、`content`、`publishedAt`、**`publishedAtISO`** ← 直接 import pandas / SQL
 - `mediaType` (`text` / `photo` / `video` / `carousel`) + `mediaUrls[]`
-- 互動數據：`likeCount`、`replyCount`、`repostCount`、`shareCount`、`viewCount`、`quoteCount`
-- `sourceType`（哪個模式抓的）、`sourceQuery`（哪個 ticker / 帳號）
+- 互動數據：`likeCount`、`replyCount`、`repostCount`、`shareCount`、`quoteCount`
+- `author`（發文者帳號）、`sourceType`（哪個模式抓的）、`sourceQuery`（哪個 ticker / 帳號）
 - `scrapedAt` 時間戳
 - `threadParts[]` — 多段 thread 自動 merge 成單筆 record
 
-### 每個作者
+### 拿不到的東西（先講清楚，省得你排進 pipeline 才發現）
 
-- `username`、`displayName`、`bio`、`profilePictureUrl`、`followerCount`
-- `verified` 標記
-
-### 留言（`post` 模式啟用 `includeReplies` 時）
-
-- 每則留言完整 metadata + 互動數據
+- **`viewCount` 一律是 `0`。** Threads 不對未登入者送觀看數，所以這個欄位存在但沒有值——不是抓失敗。
+- **沒有留言內容。** `replyCount`（留言則數）有，但留言本身沒有：Threads 2026-09 之後不再對未登入者渲染貼文頁，嵌入卡也只有單篇。
+- **作者只有帳號名。** 沒有 `displayName` / `bio` / `followerCount` / `verified`——那些要登入才拿得到。
+- **每個關鍵字約 50-70 篇封頂。** Threads 只對未登入者送搜尋結果的第一頁、而且把翻頁游標清空，所以沒有「一個詞抓五百篇」這回事。本 Actor 的做法是把同一個詞用四種形式問（熱門、最新、`#` 標籤、標籤頁），結果幾乎不重疊、合併去重後約 50-70 篇。**要更廣就多給幾個相關詞**（`台積電`、`2330`、`台積`），不要期待單一關鍵字給你無限深度。
 
 ---
 
-## ⚙️ 五種模式
+## ⚙️ 四種模式
 
 | 模式 | 用途 | 主要欄位 |
 |---|---|---|
 | **🔎 關鍵字搜尋**（預設）| 個股 / 主題輿情 — 量化常用 | `keywords[]` + 日期範圍 |
 | 🏷️ 標籤 / 話題 | `#AI概念股`、`#半導體` 等 hashtag | `keywords[]`（含 #） |
 | 👤 用戶主頁 | KOL / 分析師抓貼文 | `usernames[]` |
-| 💬 單篇貼文 + 留言 | 反方論述深 dig、突發事件分析 | `postUrls[]` + `includeReplies` |
-| 📰 自訂動態 feed 網址 | 已知 feed URL 直接抓 | `feedUrls[]` |
+| 💬 單篇貼文 | 突發事件單篇深入（不含留言，見上方）| `postUrls[]` |
+| 📰 ~~自訂動態 feed~~ | *暫不可用 — 需要登入才拿得到* | — |
 
 ---
 

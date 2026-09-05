@@ -17,8 +17,8 @@
             ],
             "enumTitles": [
                 "👤 User profile",
-                "🏷️ Tag / topic (unavailable)",
-                "🔎 Keyword search (unavailable)",
+                "🏷️ Tag / topic",
+                "🔎 Keyword search",
                 "💬 Single post",
                 "📰 Custom feed URL (unavailable)"
             ],

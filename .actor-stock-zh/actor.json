@@ -3,7 +3,7 @@
 	"actorSpecification": 1,
 	"name": "threads-stock-sentiment",
 	"title": "台股 Threads 輿情爬蟲 — 個股情緒、熱門話題、繁中量化研究專用",
-	"description": "用 Threads 做台股 / 加密 / 港股輿情監控？這隻 Actor 為量化研究員、券商分析師、AI 投顧、財經創作者設計：批量監控 100 個 ticker（台積電、輝達、聯發科、特斯拉、比特幣…），完整討論串 + 留言、ISO 時間戳、互動數據（讚、回覆、轉發、引用、觀看）直接進 pandas / BI / sentiment model。相對日期 7 天 / 1 個月排程友善。每筆 $0.005，比 RavenPack / Bloomberg sentiment 便宜兩個數量級。不用登入、不用 Threads API token。",
+	"description": "用 Threads 做台股 / 加密 / 港股輿情監控？這隻 Actor 為量化研究員、券商分析師、AI 投顧、財經創作者設計：批量監控 100 個 ticker（台積電、輝達、聯發科、特斯拉、比特幣…），每個關鍵字約 50-70 篇公開貼文、ISO 時間戳、互動數據（讚、回覆、轉發、引用）直接進 pandas / BI / sentiment model。相對日期 7 天 / 1 個月排程友善。每筆 $0.005，比 RavenPack / Bloomberg sentiment 便宜兩個數量級。不用登入、不用 Threads API token。",
 	"version": "1.0",
 	"buildTag": "latest",
 	"meta": {
