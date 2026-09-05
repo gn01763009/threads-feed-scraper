@@ -132,9 +132,14 @@ async function main(): Promise<void> {
     try {
         // --force bypasses interactive prompts (e.g. "actor doesn't exist,
         // create it?") so first-time pushes for new locales work headless.
-        // Note: use "npx apify-cli" (not "npx -y apify-cli") — the -y flag
-        // triggers a top-level await crash in apify-cli v1.4.x.
-        run('npx', ['apify-cli', 'push', '--force']);
+        // Use the globally installed `apify`, not `npx apify-cli`. npx resolves to the
+        // copy in node_modules, whose auth store is a different path from the global
+        // CLI's — so every locale push failed with "You are not logged in with your
+        // Apify account" even though `apify push` worked by hand seconds earlier
+        // (2026-09-05: that is why four locale variants sat on a 4-month-old build
+        // while the default locale was current). APIFY_TOKEN in the env does not help;
+        // that CLI version ignores it for `push`.
+        run('apify', ['push', '--force']);
 
         // Sync Store-listing title/description. Must run BEFORE restore —
         // syncActorMetadata reads from .actor/actor.json, which is still
