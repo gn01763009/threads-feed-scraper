@@ -57,6 +57,30 @@ function run(cmd: string, args: string[]): void {
     execFileSync(cmd, args, { stdio: 'inherit' });
 }
 
+/**
+ * PATH with every `node_modules/.bin` stripped out.
+ *
+ * Asking for `apify` is not enough to get the global CLI. This repo has apify-cli as a
+ * dependency, so `node_modules/.bin/apify` exists, and any launcher that front-loads that
+ * directory onto PATH — `npx tsx scripts/push-locale.ts`, npm scripts, most editors' task
+ * runners — makes the local copy win. Its auth store is a different path from the global
+ * CLI's, so the push dies with "You are not logged in" while `apify push` typed by hand
+ * works seconds later. That is the same failure the comment below describes, and switching
+ * from `npx apify-cli` to `apify` did not close it: the caller's PATH decides, not us.
+ */
+function pathWithoutLocalBins(): string {
+    return (process.env.PATH ?? '')
+        .split(':')
+        .filter((entry) => !entry.includes('node_modules/.bin'))
+        .join(':');
+}
+
+/** Run the *global* apify CLI, whatever the caller's PATH looks like. */
+function runApify(args: string[]): void {
+    console.log(`$ apify ${args.join(' ')}`);
+    execFileSync('apify', args, { stdio: 'inherit', env: { ...process.env, PATH: pathWithoutLocalBins() } });
+}
+
 function runCapture(cmd: string, args: string[]): string {
     return execFileSync(cmd, args, { encoding: 'utf8' }).trim();
 }
@@ -138,8 +162,10 @@ async function main(): Promise<void> {
         // Apify account" even though `apify push` worked by hand seconds earlier
         // (2026-09-05: that is why four locale variants sat on a 4-month-old build
         // while the default locale was current). APIFY_TOKEN in the env does not help;
-        // that CLI version ignores it for `push`.
-        run('apify', ['push', '--force']);
+        // that CLI version ignores it for `push`. runApify() is what actually enforces
+        // this — naming the binary `apify` is not enough when the caller's PATH puts
+        // node_modules/.bin first, which is exactly what `npx` does.
+        runApify(['push', '--force']);
 
         // Sync Store-listing title/description. Must run BEFORE restore —
         // syncActorMetadata reads from .actor/actor.json, which is still
