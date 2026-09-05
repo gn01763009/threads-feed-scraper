@@ -6,7 +6,7 @@
         "mode": {
             "title": "🎯 Mode",
             "type": "string",
-            "description": "What do you want to scrape? Pick a mode and fill in the matching section below.",
+            "description": "What do you want to scrape? Pick a mode and fill in the matching field below.\n\n⚠️ Since 2026-09-05 Threads no longer serves search or tag results to logged-out clients — it does not send that data at all, so no scraper can read it. Keyword search, tag and custom feed return nothing today; use User profile or Single post instead.\nSingle post now reads the public embed card: text, author, timestamp, media and engagement counts are all there, but it does **not** include replies, and counts above 999 are approximate (the card itself only shows \"1.4K\"). Below 1000 they are exact.",
             "editor": "select",
             "enum": [
                 "user",
@@ -16,11 +16,11 @@
                 "feed"
             ],
             "enumTitles": [
-                "👤 User profiles — by username",
-                "🏷️ Hashtag / topic",
-                "🔎 Keyword search",
-                "💬 Single post + replies",
-                "📰 Custom feed URL"
+                "👤 User profile",
+                "🏷️ Tag / topic (unavailable)",
+                "🔎 Keyword search (unavailable)",
+                "💬 Single post",
+                "📰 Custom feed URL (unavailable)"
             ],
             "default": "user",
             "prefill": "user",

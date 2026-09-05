@@ -6,7 +6,7 @@
         "mode": {
             "title": "🎯 Chế độ",
             "type": "string",
-            "description": "Bạn muốn scrape gì? Chọn một chế độ và điền vào phần tương ứng bên dưới.",
+            "description": "Bạn muốn thu thập gì? Chọn một chế độ và điền vào trường tương ứng bên dưới.\n\n⚠️ Từ 2026-09-05, Threads không còn trả kết quả tìm kiếm và thẻ cho client chưa đăng nhập — dữ liệu đó không được gửi đi, nên không scraper nào đọc được. Tìm kiếm từ khóa, thẻ và feed tùy chỉnh hiện không trả về gì; hãy dùng Trang cá nhân hoặc Bài viết đơn.\nBài viết đơn nay đọc thẻ nhúng công khai: nội dung, tác giả, thời gian, media và số liệu tương tác đều có, nhưng **không bao gồm phản hồi**, và số trên 999 là gần đúng (thẻ chỉ hiển thị \"1.4K\"). Dưới 1000 là chính xác.",
             "editor": "select",
             "enum": [
                 "user",
@@ -16,11 +16,11 @@
                 "feed"
             ],
             "enumTitles": [
-                "👤 Hồ sơ người dùng — theo username",
-                "🏷️ Hashtag / chủ đề",
-                "🔎 Tìm kiếm từ khóa",
-                "💬 Bài viết đơn + phản hồi",
-                "📰 URL feed tùy chỉnh"
+                "👤 Trang cá nhân",
+                "🏷️ Thẻ / chủ đề (không khả dụng)",
+                "🔎 Tìm kiếm từ khóa (không khả dụng)",
+                "💬 Bài viết đơn",
+                "📰 URL feed tùy chỉnh (không khả dụng)"
             ],
             "default": "user",
             "prefill": "user",

@@ -5,6 +5,7 @@ import { getReplyExtractScript } from './replies.js';
 import { validateInput } from './validation.js';
 import { buildSearchUrl, buildTagUrl, buildProfileUrl } from './urls.js';
 import { mergeThreadChains } from './threads.js';
+import { fetchEmbedPost } from './embed.js';
 import { fetchSsrPosts } from './ssr.js';
 import type { NormalizedInput, RawInput, ThreadsPost, ThreadsReply, SourceType } from './types.js';
 
@@ -338,8 +339,51 @@ async function runSsrRequests(): Promise<number> {
     return pushed;
 }
 
+/**
+ * `post` mode reads Threads' public embed card — see src/embed.ts. The rendered post page
+ * gives a browser nothing now (login wall) and carries no server-rendered payload either,
+ * so the card is the only logged-out source left. It costs one small HTTP GET per post.
+ */
+async function runEmbedRequests(): Promise<number> {
+    const proxyConfiguration = await Actor.createProxyConfiguration(input.proxyConfiguration);
+    let pushed = 0;
+
+    for (const { url, userData } of requests) {
+        log.info(`Fetching post: ${url}`);
+        const result = await fetchEmbedPost(url, {
+            newProxyUrl: proxyConfiguration
+                ? async () => proxyConfiguration.newUrl(`embed${Date.now()}${Math.random().toString(36).slice(2, 8)}`)
+                : undefined,
+        });
+
+        if (!result.post) {
+            // "unavailable" is an answer about the post (deleted/private), not a failure of
+            // ours — say which one it is rather than logging the same line for both.
+            log.warning(
+                result.failure === 'unavailable'
+                    ? `Post is not available (deleted, private, or wrong URL): ${url}`
+                    : `Could not fetch ${url} after ${result.attempts} attempts — Threads throttles by exit IP; retry later.`,
+            );
+            continue;
+        }
+
+        const posts = filterByDateRange([result.post]);
+        if (posts.length === 0) {
+            log.info('  outside the requested date range');
+            continue;
+        }
+        await Dataset.pushData(posts);
+        pushed += posts.length;
+        log.info(`  ok (${result.attempts} attempt(s))`);
+        void userData;
+    }
+    return pushed;
+}
+
 if (mode === 'user') {
     totalItems += await runSsrRequests();
+} else if (mode === 'post') {
+    totalItems += await runEmbedRequests();
 } else {
     await crawler.run(requests);
 }
