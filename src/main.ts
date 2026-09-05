@@ -7,6 +7,7 @@ import { buildSearchUrl, buildTagUrl, buildProfileUrl } from './urls.js';
 import { mergeThreadChains } from './threads.js';
 import { fetchEmbedPost } from './embed.js';
 import { fetchSsrPosts } from './ssr.js';
+import { fetchSearchPosts } from './search.js';
 import type { NormalizedInput, RawInput, ThreadsPost, ThreadsReply, SourceType } from './types.js';
 
 const HYDRATION_DELAY_MS = 3_000;
@@ -295,7 +296,9 @@ const crawler = new PlaywrightCrawler({
  * path returns nothing now that Threads gates the rendered view behind a login wall) and a
  * large cost cut, since Playwright is the most expensive way to fetch anything.
  *
- * The other modes still go through the browser: their pages ship no payload.
+ * `search` and `hashtag` take the same road but through src/search.ts, which fans one keyword
+ * out over several query forms because Threads serves logged-out clients no search cursor.
+ * Only `feed` still needs the browser.
  */
 async function runSsrRequests(): Promise<number> {
     const proxyConfiguration = await Actor.createProxyConfiguration(input.proxyConfiguration);
@@ -335,6 +338,60 @@ async function runSsrRequests(): Promise<number> {
         await Dataset.pushData(posts);
         pushed += posts.length;
         log.info(`  ${posts.length} posts (${result.attempts} attempt(s))`);
+    }
+    return pushed;
+}
+
+/**
+ * `search` and `hashtag` modes — one keyword fanned out over several query forms.
+ *
+ * Threads gives a logged-out client the first page of results and no way to ask for a second
+ * (see src/search.ts for the evidence), so the only lever on depth is asking the question more
+ * than one way. Measured ~5× the posts of a single request.
+ */
+async function runSearchRequests(): Promise<number> {
+    const proxyConfiguration = await Actor.createProxyConfiguration(input.proxyConfiguration);
+    if (!proxyConfiguration) {
+        log.warning(
+            'No proxy configured. Threads answers shared egress IPs with a blank page far more often — expect empty runs.',
+        );
+    }
+
+    let pushed = 0;
+    for (const { userData } of requests) {
+        const { sourceType, sourceQuery } = userData;
+        log.info(`Searching ${sourceType}: ${sourceQuery}`);
+
+        const result = await fetchSearchPosts(sourceQuery, {
+            sourceType,
+            maxPosts,
+            sort: input.searchSort,
+            newProxyUrl: proxyConfiguration
+                ? async () => proxyConfiguration.newUrl(`search${Date.now()}${Math.random().toString(36).slice(2, 8)}`)
+                : undefined,
+            onVariant: (v) =>
+                log.debug(`  ${v.kind}: ${v.outcome}, ${v.found} found, ${v.added} new (${v.attempts} attempt(s))`),
+        });
+
+        if (result.failure) {
+            log.warning(
+                `No page served for "${sourceQuery}" after ${result.attempts} attempts (${result.failure}). ` +
+                    'Threads throttles by exit IP; a different proxy group or a later retry usually clears it.',
+            );
+            continue;
+        }
+
+        const posts = filterByDateRange(result.posts).slice(0, maxPosts);
+        if (posts.length === 0) {
+            log.info(`  no results for "${sourceQuery}"`);
+            continue;
+        }
+
+        await Dataset.pushData(posts);
+        pushed += posts.length;
+        log.info(
+            `  ${posts.length} posts from ${result.variants.length} query form(s), ${result.attempts} request(s)`,
+        );
     }
     return pushed;
 }
@@ -382,6 +439,8 @@ async function runEmbedRequests(): Promise<number> {
 
 if (mode === 'user') {
     totalItems += await runSsrRequests();
+} else if (mode === 'search' || mode === 'hashtag') {
+    totalItems += await runSearchRequests();
 } else if (mode === 'post') {
     totalItems += await runEmbedRequests();
 } else {
