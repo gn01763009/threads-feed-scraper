@@ -64,6 +64,8 @@ export interface RawInput {
     dateTo?: string;
     maxPosts?: number;
     scrollCount?: number;
+    /** Apify proxy settings. Absent means "no proxy", which shares Apify's egress IPs. */
+    proxyConfiguration?: { useApifyProxy?: boolean; apifyProxyGroups?: string[]; apifyProxyCountry?: string };
 
     // Legacy v0.3 fields — auto-migrated in validation
     profileUrls?: string[];
@@ -83,4 +85,5 @@ export interface NormalizedInput {
     dateTo?: string;
     maxPosts: number;
     scrollCount: number;
+    proxyConfiguration?: { useApifyProxy?: boolean; apifyProxyGroups?: string[]; apifyProxyCountry?: string };
 }

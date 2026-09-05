@@ -8,7 +8,13 @@
             "type": "string",
             "description": "要抓什麼?選一個模式,下面對應的欄位填一下就好。",
             "editor": "select",
-            "enum": ["user", "hashtag", "search", "post", "feed"],
+            "enum": [
+                "user",
+                "hashtag",
+                "search",
+                "post",
+                "feed"
+            ],
             "enumTitles": [
                 "👤 用戶主頁 — 依帳號抓",
                 "🏷️ 標籤 / 話題",
@@ -20,16 +26,19 @@
             "prefill": "user",
             "sectionCaption": "🎯 模式"
         },
-
         "usernames": {
             "title": "👤 帳號列表",
             "type": "array",
             "description": "Threads 純帳號(不用加 @ 也不用貼網址)。例如:ponbu、zuck。用戶模式用這個欄位。",
             "editor": "stringList",
-            "items": { "type": "string" },
+            "items": {
+                "type": "string"
+            },
             "uniqueItems": true,
             "maxItems": 100,
-            "prefill": ["zuck"],
+            "prefill": [
+                "zuck"
+            ],
             "sectionCaption": "👤 用戶模式"
         },
         "bulkUsernames": {
@@ -38,13 +47,14 @@
             "description": "**一行一個帳號**,按 Enter 換行。**不要加引號、不要用逗號分隔。** 範例:\n\n```\nponbu\nzuck\nmosseri\n```\n\n直接從 Google Sheet / Excel 複製一整欄貼進來最快。執行時會自動併進上面的「帳號列表」。",
             "editor": "textarea"
         },
-
         "keywords": {
             "title": "🏷️ 關鍵字 / 標籤",
             "type": "array",
             "description": "搜尋模式的關鍵字,或標籤模式的 hashtag(開頭 # 可有可無)。例如:AI news、#寵物友善、台積電。⚠️ **一個概念一個關鍵字** — Threads 搜尋會把整串當一個詞匹配,複合詞像「冥想正念」會回 0 筆,要拆成「冥想」和「正念」兩個關鍵字分別跑。",
             "editor": "stringList",
-            "items": { "type": "string" },
+            "items": {
+                "type": "string"
+            },
             "uniqueItems": true,
             "maxItems": 100,
             "sectionCaption": "🏷️ 標籤 / 關鍵字模式"
@@ -60,11 +70,16 @@
             "type": "string",
             "description": "關鍵字搜尋的排序方式,只有「搜尋」模式會吃這個設定。",
             "editor": "select",
-            "enum": ["top", "recent"],
-            "enumTitles": ["熱門 (預設)", "最新"],
+            "enum": [
+                "top",
+                "recent"
+            ],
+            "enumTitles": [
+                "熱門 (預設)",
+                "最新"
+            ],
             "default": "top"
         },
-
         "dateFrom": {
             "title": "📅 起始日期",
             "type": "string",
@@ -78,13 +93,14 @@
             "description": "最晚的貼文日期。格式同起始日期。",
             "editor": "datepicker"
         },
-
         "postUrls": {
             "title": "💬 貼文網址",
             "type": "array",
             "description": "Threads 貼文完整網址,會一併抓留言。例如:https://www.threads.com/@user/post/ABC123。",
             "editor": "stringList",
-            "items": { "type": "string" },
+            "items": {
+                "type": "string"
+            },
             "uniqueItems": true,
             "sectionCaption": "💬 貼文 / 動態模式"
         },
@@ -93,10 +109,11 @@
             "type": "array",
             "description": "Threads 自訂 feed 網址。例如:https://www.threads.com/custom_feed/18113589370710265。",
             "editor": "stringList",
-            "items": { "type": "string" },
+            "items": {
+                "type": "string"
+            },
             "uniqueItems": true
         },
-
         "maxPosts": {
             "title": "📊 最多抓幾篇",
             "type": "integer",
@@ -105,6 +122,18 @@
             "minimum": 1,
             "maximum": 500,
             "sectionCaption": "⚙️ 一般設定"
+        },
+        "proxyConfiguration": {
+            "title": "Proxy",
+            "type": "object",
+            "description": "Threads 會依出口 IP 回不同內容——共用出口常常拿到空白頁。預設用 Apify 的 datacenter proxy，實測命中率 9/10；關掉會明顯變差。",
+            "editor": "proxy",
+            "prefill": {
+                "useApifyProxy": true
+            },
+            "default": {
+                "useApifyProxy": true
+            }
         }
     },
     "required": []
