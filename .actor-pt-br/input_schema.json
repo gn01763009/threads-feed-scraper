@@ -6,7 +6,7 @@
         "mode": {
             "title": "🎯 Modo",
             "type": "string",
-            "description": "O que você quer extrair? Escolha um modo e preencha a seção correspondente abaixo.",
+            "description": "O que você quer coletar? Escolha um modo e preencha o campo correspondente.\n\n⚠️ Desde 2026-09-05 o Threads não entrega resultados de busca nem de tags para clientes deslogados — ele simplesmente não envia esses dados, então nenhum scraper consegue lê-los. Busca por palavra-chave, tag e feed personalizado não retornam nada hoje; use Perfil de usuário ou Post único.\nPost único agora lê o cartão de incorporação público: texto, autor, data, mídia e métricas estão lá, mas **não inclui respostas**, e números acima de 999 são aproximados (o próprio cartão mostra apenas \"1.4K\"). Abaixo de 1000 são exatos.",
             "editor": "select",
             "enum": [
                 "user",
@@ -16,11 +16,11 @@
                 "feed"
             ],
             "enumTitles": [
-                "👤 Perfis de usuário — por username",
-                "🏷️ Hashtag / tópico",
-                "🔎 Busca por palavra-chave",
-                "💬 Post individual + respostas",
-                "📰 URL de feed personalizado"
+                "👤 Perfil de usuário",
+                "🏷️ Tag / tópico (indisponível)",
+                "🔎 Busca por palavra-chave (indisponível)",
+                "💬 Post único",
+                "📰 URL de feed personalizado (indisponível)"
             ],
             "default": "user",
             "prefill": "user",
