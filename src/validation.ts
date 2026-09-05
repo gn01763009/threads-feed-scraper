@@ -88,6 +88,8 @@ export function validateInput(raw: RawInput | null | undefined): NormalizedInput
         dateTo,
         maxPosts,
         scrollCount,
+        // Passed through as-is: Apify validates the object's shape against the input schema.
+        proxyConfiguration: raw.proxyConfiguration,
     };
 }
 

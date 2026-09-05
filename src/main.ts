@@ -5,6 +5,7 @@ import { getReplyExtractScript } from './replies.js';
 import { validateInput } from './validation.js';
 import { buildSearchUrl, buildTagUrl, buildProfileUrl } from './urls.js';
 import { mergeThreadChains } from './threads.js';
+import { fetchSsrPosts } from './ssr.js';
 import type { NormalizedInput, RawInput, ThreadsPost, ThreadsReply, SourceType } from './types.js';
 
 const HYDRATION_DELAY_MS = 3_000;
@@ -287,7 +288,61 @@ const crawler = new PlaywrightCrawler({
     },
 });
 
-await crawler.run(requests);
+/**
+ * Profile pages carry their posts in the server-rendered payload, so `user` mode needs no
+ * browser at all — see src/ssr.ts. This is both the fix for the 2026-09-05 outage (the DOM
+ * path returns nothing now that Threads gates the rendered view behind a login wall) and a
+ * large cost cut, since Playwright is the most expensive way to fetch anything.
+ *
+ * The other modes still go through the browser: their pages ship no payload.
+ */
+async function runSsrRequests(): Promise<number> {
+    const proxyConfiguration = await Actor.createProxyConfiguration(input.proxyConfiguration);
+    if (!proxyConfiguration) {
+        log.warning(
+            'No proxy configured. Threads answers shared egress IPs with a blank page far more often — expect empty runs.',
+        );
+    }
+
+    let pushed = 0;
+    for (const { url, userData } of requests) {
+        const { sourceType, sourceQuery } = userData;
+        log.info(`Fetching ${sourceType}: ${url}`);
+
+        const result = await fetchSsrPosts(url, {
+            sourceType,
+            sourceQuery,
+            // A flagged proxy session keeps serving the block page, so every attempt takes a
+            // fresh one — that is the difference between ~9/10 and ~0/10 success.
+            newProxyUrl: proxyConfiguration
+                ? async () => proxyConfiguration.newUrl(`ssr${Date.now()}${Math.random().toString(36).slice(2, 8)}`)
+                : undefined,
+            onAttempt: (attempt, outcome) => {
+                if (outcome !== 'ok') log.debug(`Attempt ${attempt} for ${sourceQuery}: ${outcome}`);
+            },
+        });
+
+        if (result.failure) {
+            log.warning(
+                `No posts for ${sourceType} "${sourceQuery}" after ${result.attempts} attempts (${result.failure}). ` +
+                    'Threads throttles by exit IP; a different proxy group or a later retry usually clears it.',
+            );
+            continue;
+        }
+
+        const posts = filterByDateRange(result.posts).slice(0, maxPosts);
+        await Dataset.pushData(posts);
+        pushed += posts.length;
+        log.info(`  ${posts.length} posts (${result.attempts} attempt(s))`);
+    }
+    return pushed;
+}
+
+if (mode === 'user') {
+    totalItems += await runSsrRequests();
+} else {
+    await crawler.run(requests);
+}
 
 log.info(`Scraping complete. Total items: ${totalItems}`);
 
