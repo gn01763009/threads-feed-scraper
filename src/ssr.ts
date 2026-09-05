@@ -20,8 +20,12 @@
  *      into the same wall forever. Every attempt therefore gets a fresh session id, which
  *      measured 9/10 successful fetches versus near-zero when a session was reused.
  *
- * Post/search/hashtag pages carry no payload (their `thread_items` arrays come back empty),
- * so they still need the client GraphQL call and are not handled here.
+ * Post pages carry no payload, so `post` mode reads the public embed card instead (src/embed.ts).
+ *
+ * Search and hashtag pages *do* carry it — the note that used to sit here saying they did not
+ * was wrong, and it cost a working search mode. What they lack is a usable cursor, so breadth
+ * has to come from asking several query forms rather than from paging; src/search.ts does that
+ * on top of the helpers below.
  */
 
 import { gotScraping } from 'got-scraping';
