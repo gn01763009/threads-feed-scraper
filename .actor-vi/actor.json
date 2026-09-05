@@ -1,18 +1,18 @@
 {
-	"$schema": "https://apify.com/schemas/v1/actor.ide.json",
-	"actorSpecification": 1,
-	"name": "threads-scraper-vi",
-	"title": "Threads Scraper — Bài viết, Hồ sơ, Hashtag & Tìm kiếm từ khóa",
-	"description": "Năm chế độ trích xuất Threads trong một actor: hồ sơ người dùng, hashtag, tìm kiếm từ khóa, bài viết đơn lẻ kèm phản hồi, và feed tùy chỉnh. Dán hàng loạt tối đa 100 username hoặc từ khóa, bộ lọc ngày tương đối, chỉ số tương tác, timestamp ISO. Không cần đăng nhập. $0.005 mỗi kết quả.",
-	"version": "1.0",
-	"buildTag": "latest",
-	"meta": {
-		"templateId": "ts-empty",
-		"generatedBy": "Claude Code with Claude Opus 4.6"
-	},
-	"dockerfile": "../Dockerfile",
-	"output": "./output_schema.json",
-	"storages": {
-		"dataset": "./dataset_schema.json"
-	}
+    "$schema": "https://apify.com/schemas/v1/actor.ide.json",
+    "actorSpecification": 1,
+    "name": "threads-scraper-vi",
+    "title": "Threads Scraper — Thu Thập Bài Viết Hàng Loạt (Không Đăng Nhập)",
+    "description": "Bài viết từ mọi trang cá nhân Threads: nội dung, tác giả, thời gian ISO, chỉ số tương tác, URL media. Tối đa 100 tài khoản, lọc ngày tương đối. HTTP thuần — không đăng nhập, không API token. $0.0025/kết quả.\n⚠️ Tìm kiếm/hashtag ngừng hoạt động từ 2026-09 (Threads chỉ trả cho client đã đăng nhập).",
+    "version": "1.0",
+    "buildTag": "latest",
+    "meta": {
+        "templateId": "ts-empty",
+        "generatedBy": "Claude Code with Claude Opus 4.6"
+    },
+    "dockerfile": "../Dockerfile",
+    "output": "./output_schema.json",
+    "storages": {
+        "dataset": "./dataset_schema.json"
+    }
 }
