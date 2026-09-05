@@ -1,18 +1,18 @@
 {
-	"$schema": "https://apify.com/schemas/v1/actor.ide.json",
-	"actorSpecification": 1,
-	"name": "threads-scraper-ja",
-	"title": "Threadsスクレイパー — 投稿・プロフィール・ハッシュタグ・キーワード検索",
-	"description": "Meta Threads向けのオールインワン・スクレイパー。**ユーザープロフィール、ハッシュタグ、キーワード検索、単一投稿と返信、カスタムフィード**の5つのモードを1つのアクターに集約。",
-	"version": "1.0",
-	"buildTag": "latest",
-	"meta": {
-		"templateId": "ts-empty",
-		"generatedBy": "Claude Code with Claude Opus 4.6"
-	},
-	"dockerfile": "../Dockerfile",
-	"output": "./output_schema.json",
-	"storages": {
-		"dataset": "./dataset_schema.json"
-	}
+    "$schema": "https://apify.com/schemas/v1/actor.ide.json",
+    "actorSpecification": 1,
+    "name": "threads-scraper-ja",
+    "title": "Threadsスクレイパー — プロフィール投稿の一括取得（ログイン不要）",
+    "description": "任意の Threads プロフィールから投稿を取得：本文、投稿者、ISO タイムスタンプ、エンゲージメント指標、メディア URL。最大 100 アカウント、相対日付フィルタ対応。純 HTTP — ログイン不要、API トークン不要、アカウント運用不要。1 件 $0.0025。\n⚠️ 2026-09 以降、Threads は未ログインには検索・ハッシュタグ結果を配信しないため、それらのモードは利用できません。",
+    "version": "1.0",
+    "buildTag": "latest",
+    "meta": {
+        "templateId": "ts-empty",
+        "generatedBy": "Claude Code with Claude Opus 4.6"
+    },
+    "dockerfile": "../Dockerfile",
+    "output": "./output_schema.json",
+    "storages": {
+        "dataset": "./dataset_schema.json"
+    }
 }

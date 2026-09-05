@@ -1,18 +1,18 @@
 {
-	"$schema": "https://apify.com/schemas/v1/actor.ide.json",
-	"actorSpecification": 1,
-	"name": "threads-scraper-br",
-	"title": "Threads Scraper — Posts, Perfis, Hashtag & Palavra-chave",
-	"description": "Cinco modos num só actor: perfis, hashtags, busca por palavra-chave, posts com respostas e feeds personalizados. Cole em massa até 100 usuários ou termos, filtros de data relativa, métricas de engajamento, timestamps ISO. Sem login. $0.005 por resultado.",
-	"version": "1.0",
-	"buildTag": "latest",
-	"meta": {
-		"templateId": "ts-empty",
-		"generatedBy": "Claude Code with Claude Opus 4.6"
-	},
-	"dockerfile": "../Dockerfile",
-	"output": "./output_schema.json",
-	"storages": {
-		"dataset": "./dataset_schema.json"
-	}
+    "$schema": "https://apify.com/schemas/v1/actor.ide.json",
+    "actorSpecification": 1,
+    "name": "threads-scraper-br",
+    "title": "Threads Scraper — Posts de Perfil em Massa (Sem Login)",
+    "description": "Posts de qualquer perfil do Threads: texto, autor, timestamps ISO, métricas de engajamento, URLs de mídia. Até 100 perfis, filtros de data relativa. HTTP puro — sem login, sem token. $0.0025/resultado.\n⚠️ Busca/hashtag indisponíveis: desde 2026-09 o Threads só os entrega a clientes logados.",
+    "version": "1.0",
+    "buildTag": "latest",
+    "meta": {
+        "templateId": "ts-empty",
+        "generatedBy": "Claude Code with Claude Opus 4.6"
+    },
+    "dockerfile": "../Dockerfile",
+    "output": "./output_schema.json",
+    "storages": {
+        "dataset": "./dataset_schema.json"
+    }
 }

@@ -1,18 +1,18 @@
 {
-	"$schema": "https://apify.com/schemas/v1/actor.ide.json",
-	"actorSpecification": 1,
-	"name": "threads-scraper",
-	"title": "Threads Scraper — Posts, Profiles, Hashtag & Keyword Search",
-	"description": "Five Threads scraping modes in one actor: user profiles, hashtag topics, keyword search, single posts with replies, and custom feeds. Bulk-paste up to 100 usernames or keywords, relative-date filters, engagement metrics, ISO timestamps. No login. $0.005/result.",
-	"version": "1.0",
-	"buildTag": "latest",
-	"meta": {
-		"templateId": "ts-empty",
-		"generatedBy": "Claude Code with Claude Opus 4.6"
-	},
-	"dockerfile": "../Dockerfile",
-	"output": "./output_schema.json",
-	"storages": {
-		"dataset": "./dataset_schema.json"
-	}
+    "$schema": "https://apify.com/schemas/v1/actor.ide.json",
+    "actorSpecification": 1,
+    "name": "threads-scraper",
+    "title": "Threads Scraper — Bulk Profile Posts (No Login, No API)",
+    "description": "Posts from any Threads profile: text, author, ISO timestamps, engagement metrics, media URLs. Up to 100 handles, relative-date filters. Pure HTTP — no login, no API token. $0.0025/result.\n⚠️ Search/hashtag modes unavailable: since 2026-09 Threads serves those only to logged-in clients.",
+    "version": "1.0",
+    "buildTag": "latest",
+    "meta": {
+        "templateId": "ts-empty",
+        "generatedBy": "Claude Code with Claude Opus 4.6"
+    },
+    "dockerfile": "../Dockerfile",
+    "output": "./output_schema.json",
+    "storages": {
+        "dataset": "./dataset_schema.json"
+    }
 }
