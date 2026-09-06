@@ -30,7 +30,7 @@
 | `replyCount` | 回覆數 | `6300` |
 | `repostCount` | 轉發數 | `4400` |
 | `shareCount` | 分享數 | `20300` |
-| `viewCount` | 觀看數 | `150000` |
+| `viewCount` | 觀看數 — **未登入拿不到，一律是 `0`** | `0` |
 | `quoteCount` | 引用數 | `230` |
 | `mediaType` | 媒體類型 | `text`、`photo`、`video`、`carousel` |
 | `mediaUrls` | 媒體連結陣列 | `[{ url, type }]` |
@@ -170,7 +170,7 @@ taylornikolai
 八成不是，是那個來源本來就沒那麼多可見貼文。看 run log 裡的 `totalItems` 和 `in date range` 的數字就知道爬蟲是不是有正常工作。如果你 search 的是熱門詞但每次都只回 20 篇以下，再來開 Issue。
 
 **Q: 為什麼有些欄位是 `null` 或 `0`？**
-Threads 自己就沒給。觀看數（`viewCount`）特別明顯，只有公開且互動夠高的帳號才會顯示；引用數（`quoteCount`）也會依貼文類型時有時無。這是資料缺失不是 silent failure，該有的欄位都會出現，只是值是空的。
+**`viewCount` 一律是 `0`，跟帳號大小無關。** Threads 不對未登入的訪客提供觀看數，而這隻爬蟲就是靠不登入運作的，所以那個欄位永遠拿不到值。引用數（`quoteCount`）則是真的時有時無，依貼文類型而定。兩者都不是 silent failure：欄位一定會出現，只是值是空的。
 
 **Q: `dateFrom` / `dateTo` 對每個 mode 都有效嗎？**
 技術上每個 mode 都會套日期過濾，但只有 `search`、`hashtag`、`user` 三個模式有意義。`post` 模式你給的是確定的網址，不會被日期篩掉。`feed` 模式會篩，但取決於那個 feed 本身怎麼排序。

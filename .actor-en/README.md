@@ -21,7 +21,8 @@ For every post:
 
 - `postId`, `postUrl`, `content`, `publishedAt`, `publishedAtISO`
 - `mediaType` (`text` / `photo` / `video` / `carousel`) and `mediaUrls[]`
-- Engagement: `likeCount`, `replyCount`, `repostCount`, `shareCount`, `viewCount`, `quoteCount`
+- Engagement: `likeCount`, `replyCount`, `repostCount`, `shareCount`, `quoteCount`
+  (`viewCount` is present in the output but always `0` — Threads does not serve view counts to logged-out clients)
 - `sourceType` (which mode produced it) and `sourceQuery` (the exact username / keyword / URL)
 - `scrapedAt` timestamp
 - `threadParts[]` — multi-segment thread posts are merged automatically, each segment preserved
@@ -160,7 +161,7 @@ Plain is canonical: `zuck`, not `@zuck` or `https://www.threads.com/@zuck`. Lead
 Either the profile genuinely has fewer posts, the hashtag is niche, or Threads' feed stopped yielding new items after repeated scrolls. Check `totalItems` in the run log — that's the true count.
 
 **Q: Some fields are `null` or `0`. Bug?**
-Threads lazily renders engagement counts. View counts in particular only appear on accounts with sufficient public reach; quote counts depend on post type. Missing fields are data gaps in Threads itself, not silent failures on the actor's side.
+**`viewCount` is always `0`, regardless of account size.** Threads does not serve view counts to logged-out visitors, and running logged-out is exactly how this scraper works — so that field never carries a value. `quoteCount` genuinely varies by post type. Neither is a silent failure: the fields are always present, just empty.
 
 **Q: Does `dateFrom` / `dateTo` apply to `user` and `post` modes?**
 Date filtering runs on every mode, but it only matters for `search`, `hashtag`, `user`, and `feed` — `post` mode scrapes specific known URLs regardless of date. Relative expressions like `"1 month"` are resolved to absolute `YYYY-MM-DD` before filtering.

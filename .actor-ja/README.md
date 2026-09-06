@@ -11,7 +11,8 @@ Meta Threads向けのオールインワン・スクレイパー。**ユーザー
 ### 各投稿データ:
 - `postId`、`postUrl`、`content`、`publishedAt`、`publishedAtISO`
 - メディア情報: `mediaType`（text / photo / video / carousel）、`mediaUrls[]`
-- エンゲージメント: `likeCount`、`replyCount`、`repostCount`、`shareCount`、`viewCount`、`quoteCount`
+- エンゲージメント: `likeCount`、`replyCount`、`repostCount`、`shareCount`、`quoteCount`
+  （`viewCount` は出力に含まれますが常に `0` です。Threads は未ログインには再生数を配信しません）
 - ソース情報: `sourceType`（取得モード）、`sourceQuery`（対象ユーザー名 / キーワード / URL）
 - `scrapedAt`（取得時のタイムスタンプ）
 - `threadParts[]` — 複数セグメントにわたるスレッド投稿を自動的にマージして保持。

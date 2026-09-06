@@ -32,7 +32,7 @@ Phù hợp cho: marketer, researcher, developer SaaS, team social listening và 
   * `replyCount`
   * `repostCount`
   * `shareCount`
-  * `viewCount`
+  * `viewCount` — luôn bằng `0`; Threads không cung cấp lượt xem cho người dùng chưa đăng nhập
   * `quoteCount`
 * `sourceType`, `sourceQuery`
 * `scrapedAt`
