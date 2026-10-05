@@ -1,6 +1,6 @@
 # Meta Threads 爬蟲 — 用戶主頁貼文批量下載（免登入、免 API）
 
-抓任一 Threads 用戶主頁的貼文：內容、作者、ISO 時間、完整互動數據（讚、回覆、轉發、分享、引用）、媒體網址。批量貼上 100 個帳號都吃得下。**純 HTTP、不用登入、不用 API token、不用養帳號**。每筆結果 **$0.0025**，沒有啟動費。
+抓任一 Threads 用戶主頁的貼文：內容、作者、ISO 時間、完整互動數據（讚、回覆、轉發、分享、引用）、媒體網址。批量貼上 100 個帳號都吃得下。**純 HTTP、不用登入、不用 API token、不用養帳號**。依 Apify 方案階梯計價（Free 方案每筆 **$0.005**，較高方案最低 **$0.0025**），沒有啟動費。
 
 另外支援**單篇貼文**（讀 Threads 的公開嵌入卡）。
 
@@ -9,7 +9,7 @@
 > 2026-09 曾一度判定「搜尋也拿不到」而下架該模式，那個判斷是錯的：結果其實就放在搜尋頁的
 > 伺服器端 payload 裡，只是 Threads 不給未登入者翻頁的游標。所以**每個關鍵字約 50-70 篇封頂**
 > （本 Actor 會把同一個詞用熱門／最新／`#`標籤／標籤頁四種形式各問一次再去重）。要更廣就多給幾個相關詞。
-> 這隻爬蟲不會為了繞過它去養帳號，所以那三個模式維持停用，直到 Threads 改回來。
+> 這隻爬蟲不會為了繞過它去養帳號，所以自訂 feed 模式維持停用，直到 Threads 改回來。
 
 給誰用的：做品牌輿情的、追 KOL 的、寫競品報告的、跑 SaaS 串 Threads 資料的、論文需要資料集的、自己寫 side project 的工程師。
 
@@ -39,7 +39,7 @@
 | `sourceQuery` | 抓取時用的查詢條件 | `寵物醫療` |
 | `scrapedAt` | 抓取當下時間 | `2026-03-29T05:23:28.617Z` |
 | `threadParts` | 如果是串文，自動合併每一段 | `[{ postId, content, postUrl, mediaUrls }]` |
-| `replies` | 留言（只有 post 模式才有） | `[{ author, content, publishedAt, likeCount }]` |
+| `replies` | 留言（目前恆為空陣列，Threads 不對未登入者提供；見注意事項） | `[{ author, content, publishedAt, likeCount }]` |
 
 Dataset 欄位名稱是英文（`username`、`like_count` 那種），方便你下游的程式接。
 
@@ -70,7 +70,7 @@ Dataset 欄位名稱是英文（`username`、`like_count` 那種），方便你�
 | `bulkUsernames` | string | 選填 | — | 貼上一整欄 Google Sheet / Excel 的帳號（一行一個），會自動併進 `usernames`。適合懶人模式。 |
 | `keywords` | string[] | `hashtag` / `search` 必填 | — | 關鍵字或 hashtag（開頭 `#` 可有可無）。單次最多 **100** 個。 |
 | `bulkKeywords` | string | 選填 | — | 同上，一行一個關鍵字貼上去就好。 |
-| `postUrls` | string[] | `post` 模式必填 | — | Threads 貼文完整網址，留言會一起抓。 |
+| `postUrls` | string[] | `post` 模式必填 | — | Threads 貼文完整網址（不含留言，見注意事項）。 |
 | `feedUrls` | string[] | `feed` 模式必填 | — | Threads 自訂 feed 網址。 |
 | `searchSort` | enum | 選填 | `top` | `top`（熱門）或 `recent`（最新），只對 `search` 模式有效。 |
 | `dateFrom` | string | 選填 | — | `YYYY-MM-DD` **或**相對日期：`7 days`、`1 month`、`2 weeks`、`1 year`。 |
@@ -114,7 +114,7 @@ Dataset 欄位名稱是英文（`username`、`like_count` 那種），方便你�
 }
 ```
 
-**💬 單篇爆文 + 留言**
+**💬 單篇貼文**
 
 ```json
 {
@@ -189,6 +189,21 @@ Meta 有出[官方 Threads API](https://developers.facebook.com/docs/threads)，
 - Rate limit 跟端點覆蓋度比「一個沒登入的瀏覽器看得到的東西」還窄。
 
 如果你的用途是公開資料分析（輿情、趨勢、競品、社群研究），走 scraper 快很多。如果你是要發文 / 管理自己帳號 / 跑自動化回覆，那就乖乖用官方 API。
+
+---
+
+<!-- aisocialapi-resources -->
+## 📚 延伸教學與工具
+
+這隻 actor 背後的實戰教學與免費工具，都在 **[AI Social API](https://aisocialapi.com/zh-hant/?utm_source=apify&utm_medium=readme&utm_campaign=threads-feed-scraper)**：
+
+- 📖 教學：[用關鍵字抓 Threads 貼文的 3 種方法：官方 API 的真實門檻、自寫爬蟲、還是用 Apify](https://aisocialapi.com/zh-hant/learn/threads-keyword-scraping-no-search-api/?utm_source=apify&utm_medium=readme&utm_campaign=threads-feed-scraper)
+- 📊 原創資料：[站台涵蓋表：模式、欄位與定價](https://aisocialapi.com/zh-hant/coverage/?utm_source=apify&utm_medium=readme&utm_campaign=threads-feed-scraper) — 40 個站台各有哪些模式、實際回傳哪些欄位、每筆多少錢，全部從 actor 自己的 schema 生成
+- 🛠 免費工具：[Apify 成本試算](https://aisocialapi.com/zh-hant/tools/apify-cost/?utm_source=apify&utm_medium=readme&utm_campaign=threads-feed-scraper) · [論壇輿情快查](https://aisocialapi.com/zh-hant/tools/forum-sentiment/?utm_source=apify&utm_medium=readme&utm_campaign=threads-feed-scraper)
+- 🤝 不想自己跑？[我幫你每天跑](https://aisocialapi.com/zh-hant/monitor/?utm_source=apify&utm_medium=readme&utm_campaign=threads-feed-scraper)——排程好每天送進你的 Google Sheet 或 Slack，每月 US$299 起。
+
+由實際經營 40+ 隻上架 actor 的人維護。
+<!-- /aisocialapi-resources -->
 
 ---
 

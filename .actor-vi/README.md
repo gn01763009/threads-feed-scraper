@@ -7,12 +7,12 @@ Một công cụ **all-in-one** giúp bạn thu thập dữ liệu Threads một
 * 👤 Hồ sơ người dùng
 * 🏷️ Hashtag / chủ đề
 * 🔎 Tìm kiếm từ khóa
-* 💬 Bài viết + phản hồi
-* 📰 Feed tùy chỉnh
+* 💬 Bài viết đơn (không có phản hồi)
+* 📰 Feed tùy chỉnh (hiện không khả dụng, cần đăng nhập)
 
 👉 Hỗ trợ batch lên đến **100 username hoặc keyword mỗi lần**
 👉 Trải nghiệm miễn phí
-👉 Chỉ $0.005 / mỗi kết quả 
+👉 Giá theo bậc gói Apify: $0.005 / kết quả ở gói Free, từ $0.0025 ở các gói cao hơn
 
 Phù hợp cho: marketer, researcher, developer SaaS, team social listening và data analytics.
 
@@ -46,9 +46,9 @@ Phù hợp cho: marketer, researcher, developer SaaS, team social listening và 
 
 ---
 
-### 💬 Với phản hồi (mode `post`)
+### 💬 Phản hồi
 
-* `replies[]` — tối đa 20 phản hồi hàng đầu
+* `replies[]` luôn là mảng rỗng — Threads không trả phản hồi cho client chưa đăng nhập
 
 👉 Tất cả field đều bằng tiếng Anh → dễ dàng tích hợp vào pipeline và các công cụ downstream
 
@@ -59,10 +59,10 @@ Phù hợp cho: marketer, researcher, developer SaaS, team social listening và 
 | Mode        | Mô tả                          | Input                       |
 | ----------- | ------------------------------ | --------------------------- |
 | 👤 User     | Lấy bài từ hồ sơ user          | `usernames[]`               |
-| 🏷️ Hashtag | Lấy dữ liệu từ hashtag / topic | `keywords[]`                |
-| 🔎 Search   | Tìm bài theo keyword           | `keywords[]` + `searchSort` |
-| 💬 Post     | Lấy 1 bài + replies            | `postUrls[]`                |
-| 📰 Feed     | Lấy từ feed bất kỳ             | `feedUrls[]`                |
+| 🏷️ Hashtag | Lấy dữ liệu từ hashtag / topic (~50-70 bài mỗi từ khóa) | `keywords[]`                |
+| 🔎 Search   | Tìm bài theo keyword (~50-70 bài mỗi từ khóa) | `keywords[]` + `searchSort` |
+| 💬 Post     | Lấy 1 bài (không có replies)   | `postUrls[]`                |
+| 📰 Feed     | Không khả dụng (cần đăng nhập) | —                           |
 
 👉 Không cần dùng nhiều công cụ scraper khác — tất cả trong một công cụ duy nhất.
 
@@ -126,7 +126,7 @@ Phù hợp cho: marketer, researcher, developer SaaS, team social listening và 
 
 ---
 
-### 💬 Scrape 1 post + replies
+### 💬 Scrape 1 post
 
 ```json
 {
@@ -142,7 +142,7 @@ Phù hợp cho: marketer, researcher, developer SaaS, team social listening và 
 * `maxPosts` là giới hạn tối đa — không đảm bảo đủ số lượng
 * Dữ liệu tương tác (like, view…) có thể là **ước lượng**
 * Chỉ trích xuất **dữ liệu công khai** (không cần đăng nhập / API key)
-* Mode `post` mới có replies (~20 phản hồi đầu)
+* Mode `post` đọc thẻ nhúng công khai nên không có replies; search/hashtag chỉ nhận trang kết quả đầu (~50-70 bài mỗi từ khóa) — thêm từ khóa liên quan để mở rộng
 * Thread nhiều phần sẽ được **tự động gộp**
 
 ---

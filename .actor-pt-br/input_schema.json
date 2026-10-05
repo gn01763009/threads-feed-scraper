@@ -6,7 +6,7 @@
         "mode": {
             "title": "🎯 Modo",
             "type": "string",
-            "description": "O que você quer coletar? Escolha um modo e preencha o campo correspondente.\n\n⚠️ Desde 2026-09-05 o Threads não entrega resultados de busca nem de tags para clientes deslogados — ele simplesmente não envia esses dados, então nenhum scraper consegue lê-los. Busca por palavra-chave, tag e feed personalizado não retornam nada hoje; use Perfil de usuário ou Post único.\nPost único agora lê o cartão de incorporação público: texto, autor, data, mídia e métricas estão lá, mas **não inclui respostas**, e números acima de 999 são aproximados (o próprio cartão mostra apenas \"1.4K\"). Abaixo de 1000 são exatos.",
+            "description": "O que você quer coletar? Escolha um modo e preencha o campo correspondente.\n\n⚠️ O feed personalizado exige login e está indisponível. Busca por palavra-chave e Tag funcionam, mas o Threads entrega a clientes deslogados só a primeira página de resultados, então espere ~50-70 posts por keyword; adicione keywords relacionadas para mais alcance.\nPost único agora lê o cartão de incorporação público: texto, autor, data, mídia e métricas estão lá, mas **não inclui respostas**, e números acima de 999 são aproximados (o próprio cartão mostra apenas \"1.4K\"). Abaixo de 1000 são exatos.",
             "editor": "select",
             "enum": [
                 "user",
@@ -117,7 +117,7 @@
         "maxPosts": {
             "title": "📊 Máximo de posts",
             "type": "integer",
-            "description": "Número máximo de posts por fonte. Mais posts = mais resultados faturáveis ($0.005 cada). A rolagem é gerenciada automaticamente.",
+            "description": "Número máximo de posts por fonte. Mais posts = mais resultados faturáveis (preço escalonado, a partir de $0.0025 cada). A rolagem é gerenciada automaticamente.",
             "default": 50,
             "minimum": 1,
             "maximum": 500,

@@ -6,7 +6,7 @@
         "mode": {
             "title": "🎯 Mode",
             "type": "string",
-            "description": "What do you want to scrape? Pick a mode and fill in the matching field below.\n\n⚠️ Since 2026-09-05 Threads no longer serves search or tag results to logged-out clients — it does not send that data at all, so no scraper can read it. Keyword search, tag and custom feed return nothing today; use User profile or Single post instead.\nSingle post now reads the public embed card: text, author, timestamp, media and engagement counts are all there, but it does **not** include replies, and counts above 999 are approximate (the card itself only shows \"1.4K\"). Below 1000 they are exact.",
+            "description": "What do you want to scrape? Pick a mode and fill in the matching field below.\n\n⚠️ Custom feed needs a login and is unavailable. Keyword search and Tag work, but Threads serves logged-out clients only the first page of results, so expect ~50-70 posts per keyword; add related keywords for more breadth.\nSingle post now reads the public embed card: text, author, timestamp, media and engagement counts are all there, but it does **not** include replies, and counts above 999 are approximate (the card itself only shows \"1.4K\"). Below 1000 they are exact.",
             "editor": "select",
             "enum": [
                 "user",
@@ -117,7 +117,7 @@
         "maxPosts": {
             "title": "📊 Max Posts",
             "type": "integer",
-            "description": "Maximum posts to scrape per source. Higher = more billable results ($0.005 each). Scrolling is auto-managed.",
+            "description": "Maximum posts to scrape per source. Higher = more billable results (tiered pricing, from $0.0025 each). Scrolling is auto-managed.",
             "default": 50,
             "minimum": 1,
             "maximum": 500,

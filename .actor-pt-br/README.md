@@ -1,6 +1,6 @@
 # 🧵 Threads Scraper — Documentação Oficial
 
-O **Threads Scraper** é uma solução unificada para extração de dados públicos do Meta Threads. Desenvolvido para máxima eficiência, ele permite coletar dados de **perfis, hashtags, buscas por keywords, posts individuais e feeds** sem a necessidade de login ou tokens oficiais da API da Meta.
+O **Threads Scraper** é uma solução unificada para extração de dados públicos do Meta Threads. Desenvolvido para máxima eficiência, ele permite coletar dados de **perfis, hashtags, buscas por keywords e posts individuais** (feeds personalizados estão indisponíveis) sem a necessidade de login ou tokens oficiais da API da Meta.
 
 ## 🚀 Visão Geral
 
@@ -8,7 +8,7 @@ Este Actor foi desenhado para ser **plug-and-play**. Ideal para times de marketi
 
 * **Zero Setup:** Sem necessidade de login ou proxy complexo.
 * **Escalabilidade:** Suporta input em massa (bulk) de até 100 entradas por execução.
-* **Custo-Benefício:** Modelo *pay-as-you-go* de **$0.005 por resultado**, sem taxas de adesão.
+* **Custo-Benefício:** Modelo *pay-as-you-go* com preço escalonado por plano da Apify (**$0.005 por resultado** no plano Free, a partir de **$0.0025** nos planos superiores), sem taxas de adesão.
 
 ---
 
@@ -28,7 +28,7 @@ Para cada post processado, o scraper entrega um dataset estruturado com os segui
 ### Objeto: Autor & Respostas
 
 * `author`: Handle do usuário.
-* `replies[]`: (Apenas no modo `post`) Lista das 20 principais respostas, incluindo autor e conteúdo.
+* `replies[]`: sempre um array vazio — o Threads não entrega respostas a clientes deslogados.
 
 > **Nota Técnica:** Os nomes dos campos (chaves do JSON) são mantidos em inglês para garantir compatibilidade com pipelines de dados internacionais e bibliotecas de integração.
 
@@ -41,10 +41,10 @@ O Scraper opera em 5 modos distintos, selecionáveis via parâmetro `mode`:
 | Modo | Descrição | Input Principal |
 | :--- | :--- | :--- |
 | **👤 User** | Extrai o histórico de posts de perfis específicos. | `usernames[]` |
-| **🏷️ Hashtag** | Scrape de posts associados a uma hashtag ou tópico. | `keywords[]` |
-| **🔎 Search** | Busca global por palavras-chave (Top ou Recentes). | `keywords[]` |
-| **💬 Post** | Foca em um post específico e suas respostas (replies). | `postUrls[]` |
-| **📰 Feed** | Coleta dados de qualquer URL de feed customizado. | `feedUrls[]` |
+| **🏷️ Hashtag** | Scrape de posts associados a uma hashtag ou tópico (~50-70 posts por keyword). | `keywords[]` |
+| **🔎 Search** | Busca por palavras-chave (Top ou Recentes), ~50-70 posts por keyword. | `keywords[]` |
+| **💬 Post** | Foca em um post específico (sem respostas). | `postUrls[]` |
+| **📰 Feed** | *Indisponível — exige login.* | — |
 
 ---
 
@@ -88,6 +88,9 @@ O Scraper opera em 5 modos distintos, selecionáveis via parâmetro `mode`:
 
 ## ⚠️ Notas e Limites Técnicos
 
+* **Respostas e profundidade:** o modo `post` lê o cartão de incorporação público, que não traz respostas. Busca e hashtag recebem só a primeira página de resultados (~50-70 posts por keyword) — use várias keywords relacionadas para mais alcance.
+* **Respostas e profundidade:** o modo `post` lê o cartão de incorporação público, que não traz respostas. Busca e hashtag recebem só a primeira página de resultados (~50-70 posts por keyword) — use várias keywords relacionadas para mais alcance.
+* **Respostas e profundidade:** o modo `post` lê o cartão de incorporação público, que não traz respostas. Busca e hashtag recebem só a primeira página de resultados (~50-70 posts por keyword) — use várias keywords relacionadas para mais alcance.
 * **Early Exit:** O scraper possui inteligência para interromper a execução caso detecte feeds inativos, economizando créditos.
 * **Normalização de Métricas:** Valores abreviados pelo Threads (ex: `10K`) são automaticamente convertidos para inteiros (`10000`) para facilitar cálculos.
 * **Dados Públicos:** O acesso é limitado a conteúdos visíveis sem login. Perfis privados não são acessíveis.
