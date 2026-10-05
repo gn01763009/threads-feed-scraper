@@ -8,7 +8,7 @@ Este Actor foi desenhado para ser **plug-and-play**. Ideal para times de marketi
 
 * **Zero Setup:** Sem necessidade de login ou proxy complexo.
 * **Escalabilidade:** Suporta input em massa (bulk) de até 100 entradas por execução.
-* **Custo-Benefício:** Modelo *pay-as-you-go* com preço escalonado por plano da Apify (**$0.005 por resultado** no plano Free, a partir de **$0.0025** nos planos superiores), sem taxas de adesão.
+* **Custo-Benefício:** Modelo *pay-as-you-go* de **$0.005 por resultado**, sem taxas de adesão.
 
 ---
 

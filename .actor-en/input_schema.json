@@ -117,7 +117,7 @@
         "maxPosts": {
             "title": "📊 Max Posts",
             "type": "integer",
-            "description": "Maximum posts to scrape per source. Higher = more billable results (tiered pricing, from $0.0025 each). Scrolling is auto-managed.",
+            "description": "Maximum posts to scrape per source. Higher = more billable results ($0.005 each). Scrolling is auto-managed.",
             "default": 50,
             "minimum": 1,
             "maximum": 500,

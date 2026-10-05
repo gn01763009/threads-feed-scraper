@@ -11,7 +11,7 @@ Unlock deep market insights with a unified scraper. No login, no tokens, and no 
 - Massive Scalability: Bulk-paste up to 100 usernames or keywords. Perfect for tracking large KOL lists.
 - Workflow-Ready: Built-in support for relative dates (e.g., "7 days") makes it easy to schedule recurring runs in n8n, Zapier, or Make.
 - Clean, Merged Data: Multi-segment thread posts are automatically stitched into a single record (threadParts[]) for better readability.
-- Cost-Efficient: Tiered per-result pricing ($0.005 on the Free plan, from $0.0025 on higher Apify plans) with no start fees and smart auto-stop to prevent wasted credits.
+- Cost-Efficient: Flat $0.005 per result with no start fees and smart auto-stop to prevent wasted credits.
 
 ---
 
