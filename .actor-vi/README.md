@@ -12,7 +12,7 @@ Một công cụ **all-in-one** giúp bạn thu thập dữ liệu Threads một
 
 👉 Hỗ trợ batch lên đến **100 username hoặc keyword mỗi lần**
 👉 Trải nghiệm miễn phí
-👉 Giá theo bậc gói Apify: $0.005 / kết quả ở gói Free, từ $0.0025 ở các gói cao hơn
+👉 Chỉ $0.005 / mỗi kết quả
 
 Phù hợp cho: marketer, researcher, developer SaaS, team social listening và data analytics.
 

@@ -117,7 +117,7 @@
         "maxPosts": {
             "title": "📊 Số bài tối đa",
             "type": "integer",
-            "description": "Số bài viết tối đa trên mỗi nguồn. Càng nhiều thì càng nhiều kết quả tính phí (giá theo bậc, từ $0.0025 mỗi bài). Cuộn trang được quản lý tự động.",
+            "description": "Số bài viết tối đa trên mỗi nguồn. Càng nhiều thì càng nhiều kết quả tính phí ($0.005 mỗi bài). Cuộn trang được quản lý tự động.",
             "default": 50,
             "minimum": 1,
             "maximum": 500,

@@ -3,7 +3,7 @@
     "actorSpecification": 1,
     "name": "threads-scraper-vi",
     "title": "Threads Scraper — Thu Thập Bài Viết Hàng Loạt (Không Đăng Nhập)",
-    "description": "Bài viết từ mọi trang cá nhân Threads: nội dung, tác giả, thời gian ISO, chỉ số tương tác, URL media. Tối đa 100 tài khoản, ngày tương đối. Không đăng nhập, không API token. Giá theo bậc: $0.005/kết quả (gói Free), từ $0.0025 (gói cao hơn).\n⚠️ Feed tùy chỉnh không khả dụng (cần đăng nhập).",
+    "description": "Bài viết từ mọi trang cá nhân Threads: nội dung, tác giả, thời gian ISO, chỉ số tương tác, URL media. Tối đa 100 tài khoản, ngày tương đối. Không đăng nhập, không API token. $0.005/kết quả.\n⚠️ Feed tùy chỉnh không khả dụng (cần đăng nhập).",
     "version": "1.0",
     "buildTag": "latest",
     "meta": {

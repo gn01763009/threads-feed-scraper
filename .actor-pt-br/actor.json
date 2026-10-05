@@ -3,7 +3,7 @@
     "actorSpecification": 1,
     "name": "threads-scraper-br",
     "title": "Threads Scraper — Posts de Perfil em Massa (Sem Login)",
-    "description": "Posts de qualquer perfil do Threads: texto, autor, timestamps ISO, métricas de engajamento, URLs de mídia. Até 100 perfis, datas relativas. Sem login, sem token. Preço escalonado: $0.005/resultado (plano Free), a partir de $0.0025 nos superiores.\n⚠️ Feed personalizado indisponível (exige login).",
+    "description": "Posts de qualquer perfil do Threads: texto, autor, timestamps ISO, métricas de engajamento, URLs de mídia. Até 100 perfis, datas relativas. Sem login, sem token. $0.005 por resultado.\n⚠️ Feed personalizado indisponível (exige login).",
     "version": "1.0",
     "buildTag": "latest",
     "meta": {
