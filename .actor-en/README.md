@@ -11,7 +11,7 @@ Unlock deep market insights with a unified scraper. No login, no tokens, and no 
 - Massive Scalability: Bulk-paste up to 100 usernames or keywords. Perfect for tracking large KOL lists.
 - Workflow-Ready: Built-in support for relative dates (e.g., "7 days") makes it easy to schedule recurring runs in n8n, Zapier, or Make.
 - Clean, Merged Data: Multi-segment thread posts are automatically stitched into a single record (threadParts[]) for better readability.
-- Cost-Efficient: Flat $0.005 per result with no start fees and smart auto-stop to prevent wasted credits.
+- Cost-Efficient: Tiered per-result pricing ($0.005 on the Free plan, from $0.0025 on higher Apify plans) with no start fees and smart auto-stop to prevent wasted credits.
 
 ---
 
@@ -31,23 +31,21 @@ For the author:
 
 - `author` handle
 
-For replies (only in `post` mode):
-
-- `replies[]` — up to 20 top replies with `author`, `content`, `publishedAt`, `likeCount`
+Replies: `replies[]` is always an empty array — Threads does not serve replies to logged-out clients (see notes).
 
 Dataset field keys are English across every locale — downstream tooling stays portable.
 
 ---
 
-## Five modes, one actor
+## Five modes, one actor (four available) (four available) (four available)
 
 | Mode | What it does | Input field |
 |------|--------------|-------------|
 | 👤 **User** | Scrape all posts from a user's profile | `usernames[]` |
-| 🏷️ **Hashtag** | Scrape a hashtag / topic page | `keywords[]` |
-| 🔎 **Search** | Keyword search with Top / Recent sort | `keywords[]` + `searchSort` |
-| 💬 **Post** | Single post with up to 20 top replies | `postUrls[]` |
-| 📰 **Feed** | Any Threads custom feed URL | `feedUrls[]` |
+| 🏷️ **Hashtag** | Scrape a hashtag / topic page (~50-70 posts per keyword) | `keywords[]` |
+| 🔎 **Search** | Keyword search with Top / Recent sort (~50-70 posts per keyword) | `keywords[]` + `searchSort` |
+| 💬 **Post** | Single post (no replies — see notes) | `postUrls[]` |
+| 📰 **Feed** | *Unavailable — Threads serves feeds only to logged-in clients* | — |
 
 Pick one mode per run from the **Mode** dropdown. Competing scrapers split these into 4–5 separate actors — this one keeps them in a single codebase so your integration stays simple.
 
@@ -62,8 +60,8 @@ Pick one mode per run from the **Mode** dropdown. Competing scrapers split these
 | `bulkUsernames` | string | optional | — | Textarea — paste one username per line (copy a spreadsheet column straight in). Merged into `usernames`. |
 | `keywords` | string[] | for `hashtag` / `search` | — | Keywords or hashtags (leading `#` optional). Batch up to **100**. |
 | `bulkKeywords` | string | optional | — | Textarea paste for keywords. Merged into `keywords`. |
-| `postUrls` | string[] | for `post` mode | — | Full Threads post URLs — replies are scraped automatically. |
-| `feedUrls` | string[] | for `feed` mode | — | Threads custom feed URLs. |
+| `postUrls` | string[] | for `post` mode | — | Full Threads post URLs (replies are not included). |
+| `feedUrls` | string[] | for `feed` mode | — | Unavailable (needs login). |
 | `searchSort` | enum | optional | `top` | `top` or `recent`. Only applies to `search` mode. |
 | `dateFrom` | string | optional | — | `YYYY-MM-DD` **or** relative: `7 days`, `1 month`, `2 weeks`, `1 year`. |
 | `dateTo` | string | optional | — | Same format as `dateFrom`. |
@@ -106,7 +104,7 @@ Pick one mode per run from the **Mode** dropdown. Competing scrapers split these
 }
 ```
 
-**💬 Single post + top replies**
+**💬 Single post**
 
 ```json
 {
@@ -146,7 +144,7 @@ If you're calling the API instead of using the Console, `bulkUsernames` is a sin
 - **`maxPosts` is a ceiling, not a guarantee.** Inactive profiles or niche hashtags may return fewer posts. The scraper stops early after 5 consecutive stale scrolls instead of burning time.
 - **Relative dates are evaluated at run time.** `"7 days"` today and tomorrow produce different absolute dates — useful for scheduled runs that always fetch "the past week".
 - **Engagement counts can be approximations.** Threads abbreviates large numbers (e.g. `12.5K`) — the actor normalizes these to integers, so `12500` is the converted value, not an exact count.
-- **Replies are only scraped in `post` mode**, limited to the first ~20 top-level replies per post.
+- **Replies are not available.** `post` mode reads the public embed card, which carries the post only; `replies[]` is empty. Search and hashtag return the first results page only (~50-70 posts per keyword, merged from several query forms) — give several related keywords for more breadth. Custom feed mode is unavailable because it needs a login.
 - **No login = public data only.** Private accounts and follower-only content are not accessible.
 - **Thread chains are merged automatically.** Multi-segment posts (`1/`, `2/`, `3/`) are combined into a single record via `threadParts[]` instead of being stored as separate rows.
 

@@ -13,8 +13,8 @@
                 "🔎 關鍵字搜尋 — 個股 / 主題輿情(預設)",
                 "🏷️ 標籤 / 話題 — #台積電、#AI概念股",
                 "👤 用戶主頁 — KOL / 分析師抓貼文",
-                "💬 單篇貼文 + 留言 — 深 dig 反方論述",
-                "📰 自訂動態 feed 網址"
+                "💬 單篇貼文(不含留言)",
+                "📰 自訂動態 feed 網址(暫不可用,需登入)"
             ],
             "default": "search",
             "prefill": "search",
@@ -100,11 +100,23 @@
         "maxPosts": {
             "title": "📊 最多抓幾篇",
             "type": "integer",
-            "description": "每個來源最多抓幾篇貼文。越多費用越高 (每筆 $0.005)。捲動次數會自動算,不用手動調。",
+            "description": "每個來源最多抓幾篇貼文。越多費用越高 (依方案階梯計價,每筆 $0.0025 起)。捲動次數會自動算,不用手動調。",
             "default": 50,
             "minimum": 1,
             "maximum": 500,
             "sectionCaption": "⚙️ 一般設定"
+        },
+        "proxyConfiguration": {
+            "title": "Proxy",
+            "type": "object",
+            "description": "Threads 會依出口 IP 回不同內容——共用出口常常拿到空白頁。預設用 Apify 的 datacenter proxy，實測命中率 9/10；關掉會明顯變差。",
+            "editor": "proxy",
+            "prefill": {
+                "useApifyProxy": true
+            },
+            "default": {
+                "useApifyProxy": true
+            }
         }
     },
     "required": []
