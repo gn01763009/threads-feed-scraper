@@ -100,18 +100,16 @@ describe('validateInput — auto-detect + legacy backcompat', () => {
 });
 
 describe('validateInput — URLs', () => {
-    it('accepts valid feedUrls', () => {
-        const r = validateInput({
-            mode: 'feed',
-            feedUrls: ['https://www.threads.com/custom_feed/123'],
-        });
-        expect(r.feedUrls).toEqual(['https://www.threads.com/custom_feed/123']);
+    it('rejects feed mode with a clear message', () => {
+        expect(() =>
+            validateInput({ mode: 'feed', feedUrls: ['https://www.threads.com/custom_feed/123'] }),
+        ).toThrow('not supported');
     });
 
-    it('rejects invalid feed URL hostname', () => {
-        expect(() =>
-            validateInput({ mode: 'feed', feedUrls: ['https://example.com/feed'] }),
-        ).toThrow('Invalid feed URL');
+    it('rejects feedUrls even when mode is omitted', () => {
+        expect(() => validateInput({ feedUrls: ['https://www.threads.com/custom_feed/123'] })).toThrow(
+            'not supported',
+        );
     });
 
     it('accepts valid postUrls', () => {

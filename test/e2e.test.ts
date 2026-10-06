@@ -157,31 +157,6 @@ describe('E2E 03 — search mode + relative date (fixture 03-search-relative-dat
     });
 });
 
-// ─── 04: Feed mode ──────────────────────────────────────────────────────────
-
-describe('E2E 04 — feed mode (fixture 04-feed.json)', { timeout: 180_000 }, () => {
-    let items: Record<string, unknown>[] = [];
-
-    beforeAll(() => {
-        clearDataset();
-        setInput(fixture('04-feed.json'));
-        runActor();
-        items = getDatasetItems();
-    });
-
-    it('extracts at least 1 post', () => {
-        expect(items.length).toBeGreaterThanOrEqual(1);
-    });
-
-    it('every post has required shape', () => {
-        for (const item of items) assertPostShape(item);
-    });
-
-    it('sourceType is "feed"', () => {
-        for (const item of items) expect(item.sourceType).toBe('feed');
-    });
-});
-
 // ─── 05: Legacy backcompat ──────────────────────────────────────────────────
 
 describe('E2E 05 — legacy v0.3 input (fixture 05-legacy-backcompat.json)', { timeout: 180_000 }, () => {

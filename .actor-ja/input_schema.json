@@ -12,15 +12,13 @@
                 "user",
                 "hashtag",
                 "search",
-                "post",
-                "feed"
+                "post"
             ],
             "enumTitles": [
                 "👤 ユーザープロフィール",
                 "🏷️ タグ / トピック",
                 "🔎 キーワード検索",
-                "💬 単一投稿",
-                "📰 カスタムフィード URL（現在利用不可）"
+                "💬 単一投稿"
             ],
             "default": "user",
             "prefill": "user",
@@ -103,16 +101,6 @@
             },
             "uniqueItems": true,
             "sectionCaption": "💬 投稿 / フィードモード"
-        },
-        "feedUrls": {
-            "title": "📰 フィードURL",
-            "type": "array",
-            "description": "Threadsのカスタムフィードのurl。モード=Feedの時に使用します。例:https://www.threads.com/custom_feed/18113589370710265。",
-            "editor": "stringList",
-            "items": {
-                "type": "string"
-            },
-            "uniqueItems": true
         },
         "maxPosts": {
             "title": "📊 最大投稿数",

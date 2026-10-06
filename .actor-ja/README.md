@@ -45,13 +45,12 @@ Meta Threads向けのオールインワン・スクレイパー。**ユーザー
 
 | フィールド | 型 | 必須 | デフォルト | 説明 |
 |-----------|----|:----:|:---------:|------|
-| `mode` | enum | 推奨 | `user` | `user`、`hashtag`、`search`、`post`、`feed`から選択。未入力時は自動判定。 |
+| `mode` | enum | 推奨 | `user` | `user`、`hashtag`、`search`、`post`から選択（`feed`を指定すると実行は理由付きで失敗します）。未入力時は自動判定。 |
 | `usernames` | string[] | `user`時 | — | ユーザー名のみ。`@`やURLは不要。最大100件。 |
 | `bulkUsernames` | string | 任意 | — | 複数ユーザー名の一括貼り付け用（スプレッドシートの列をそのままコピー可能）。 |
 | `keywords` | string[] | `hashtag/search`時 | — | キーワードまたはハッシュタグ（`#`は省略可）。最大100件。 |
 | `bulkKeywords` | string | 任意 | — | キーワードの一括貼り付け用。 |
 | `postUrls` | string[] | `post`時 | — | 投稿の完全なURL（返信は含まれません）。 |
-| `feedUrls` | string[] | `feed`時 | — | 現在利用不可（ログインが必要）。 |
 | `searchSort` | enum | 任意 | `top` | `top`（人気）または`recent`（最新）。`search`モードで適用。 |
 | `dateFrom` | string | 任意 | — | `YYYY-MM-DD` または相対指定（例: `7 days`、`1 month`）。 |
 | `dateTo` | string | 任意 | — | `dateFrom`と同じ形式。 |

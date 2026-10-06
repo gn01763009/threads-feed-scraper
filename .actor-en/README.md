@@ -55,13 +55,12 @@ Pick one mode per run from the **Mode** dropdown. Competing scrapers split these
 
 | Field | Type | Required | Default | Description |
 |-------|------|:--------:|:-------:|-------------|
-| `mode` | enum | recommended | `user` | One of `user`, `hashtag`, `search`, `post`, `feed`. If omitted, auto-detected from whichever field you fill. |
+| `mode` | enum | recommended | `user` | One of `user`, `hashtag`, `search`, `post` (`feed` fails the run with a clear message). If omitted, auto-detected from whichever field you fill. |
 | `usernames` | string[] | for `user` mode | — | Plain usernames, no `@`, no URL. Batch up to **100**. |
 | `bulkUsernames` | string | optional | — | Textarea — paste one username per line (copy a spreadsheet column straight in). Merged into `usernames`. |
 | `keywords` | string[] | for `hashtag` / `search` | — | Keywords or hashtags (leading `#` optional). Batch up to **100**. |
 | `bulkKeywords` | string | optional | — | Textarea paste for keywords. Merged into `keywords`. |
 | `postUrls` | string[] | for `post` mode | — | Full Threads post URLs (replies are not included). |
-| `feedUrls` | string[] | for `feed` mode | — | Unavailable (needs login). |
 | `searchSort` | enum | optional | `top` | `top` or `recent`. Only applies to `search` mode. |
 | `dateFrom` | string | optional | — | `YYYY-MM-DD` **or** relative: `7 days`, `1 month`, `2 weeks`, `1 year`. |
 | `dateTo` | string | optional | — | Same format as `dateFrom`. |
@@ -162,7 +161,7 @@ Either the profile genuinely has fewer posts, the hashtag is niche, or Threads' 
 **`viewCount` is always `0`, regardless of account size.** Threads does not serve view counts to logged-out visitors, and running logged-out is exactly how this scraper works — so that field never carries a value. `quoteCount` genuinely varies by post type. Neither is a silent failure: the fields are always present, just empty.
 
 **Q: Does `dateFrom` / `dateTo` apply to `user` and `post` modes?**
-Date filtering runs on every mode, but it only matters for `search`, `hashtag`, `user`, and `feed` — `post` mode scrapes specific known URLs regardless of date. Relative expressions like `"1 month"` are resolved to absolute `YYYY-MM-DD` before filtering.
+Date filtering runs on every mode, but it only matters for `search`, `hashtag` and `user` — `post` mode scrapes specific known URLs regardless of date. Relative expressions like `"1 month"` are resolved to absolute `YYYY-MM-DD` before filtering.
 
 **Q: What output formats are supported?**
 JSON, CSV, Excel, XML, HTML table — standard Apify dataset exports. Available via the Apify Console, the dataset API, or the Apify client libraries (Python, JavaScript). Also integrates with Zapier, Make, n8n, and Google Sheets.

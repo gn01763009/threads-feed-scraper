@@ -35,7 +35,7 @@
 | `mediaType` | 媒體類型 | `text`、`photo`、`video`、`carousel` |
 | `mediaUrls` | 媒體連結陣列 | `[{ url, type }]` |
 | `postUrl` | 貼文網址 | `https://www.threads.com/@user/post/...` |
-| `sourceType` | 這筆從哪個模式來的 | `profile`、`tag`、`search`、`post`、`feed` |
+| `sourceType` | 這筆從哪個模式來的 | `profile`、`tag`、`search`、`post` |
 | `sourceQuery` | 抓取時用的查詢條件 | `寵物醫療` |
 | `scrapedAt` | 抓取當下時間 | `2026-03-29T05:23:28.617Z` |
 | `threadParts` | 如果是串文，自動合併每一段 | `[{ postId, content, postUrl, mediaUrls }]` |
@@ -65,13 +65,12 @@ Dataset 欄位名稱是英文（`username`、`like_count` 那種），方便你�
 
 | 欄位 | 型別 | 必填 | 預設 | 說明 |
 |------|------|:----:|:----:|------|
-| `mode` | enum | 建議填 | `user` | `user` / `hashtag` / `search` / `post` / `feed` 擇一。不填的話會自動偵測你填了什麼欄位。 |
+| `mode` | enum | 建議填 | `user` | `user` / `hashtag` / `search` / `post` 擇一（填 `feed` 會直接讓這次執行失敗並說明原因）。不填的話會自動偵測你填了什麼欄位。 |
 | `usernames` | string[] | `user` 模式必填 | — | 純帳號，不用加 `@` 也不用貼整串網址。單次最多 **100** 個。 |
 | `bulkUsernames` | string | 選填 | — | 貼上一整欄 Google Sheet / Excel 的帳號（一行一個），會自動併進 `usernames`。適合懶人模式。 |
 | `keywords` | string[] | `hashtag` / `search` 必填 | — | 關鍵字或 hashtag（開頭 `#` 可有可無）。單次最多 **100** 個。 |
 | `bulkKeywords` | string | 選填 | — | 同上，一行一個關鍵字貼上去就好。 |
 | `postUrls` | string[] | `post` 模式必填 | — | Threads 貼文完整網址（不含留言，見注意事項）。 |
-| `feedUrls` | string[] | `feed` 模式必填 | — | Threads 自訂 feed 網址。 |
 | `searchSort` | enum | 選填 | `top` | `top`（熱門）或 `recent`（最新），只對 `search` 模式有效。 |
 | `dateFrom` | string | 選填 | — | `YYYY-MM-DD` **或**相對日期：`7 days`、`1 month`、`2 weeks`、`1 year`。 |
 | `dateTo` | string | 選填 | — | 同 `dateFrom` 格式。 |
@@ -173,7 +172,7 @@ taylornikolai
 **`viewCount` 一律是 `0`，跟帳號大小無關。** Threads 不對未登入的訪客提供觀看數，而這隻爬蟲就是靠不登入運作的，所以那個欄位永遠拿不到值。引用數（`quoteCount`）則是真的時有時無，依貼文類型而定。兩者都不是 silent failure：欄位一定會出現，只是值是空的。
 
 **Q: `dateFrom` / `dateTo` 對每個 mode 都有效嗎？**
-技術上每個 mode 都會套日期過濾，但只有 `search`、`hashtag`、`user` 三個模式有意義。`post` 模式你給的是確定的網址，不會被日期篩掉。`feed` 模式會篩，但取決於那個 feed 本身怎麼排序。
+技術上每個 mode 都會套日期過濾，但只有 `search`、`hashtag`、`user` 三個模式有意義。`post` 模式你給的是確定的網址，不會被日期篩掉。
 
 **Q: 可以匯出哪些格式？**
 JSON、CSV、Excel、XML、HTML table — Apify dataset 標準的幾種都有，可以從 Console 下載，或接 Apify API / Python / JavaScript SDK。串 Zapier、Make、n8n、Google Sheets 也都行。

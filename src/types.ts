@@ -1,4 +1,4 @@
-export type Mode = 'user' | 'hashtag' | 'search' | 'post' | 'feed';
+export type Mode = 'user' | 'hashtag' | 'search' | 'post';
 
 export type SourceType = 'feed' | 'search' | 'tag' | 'profile' | 'post';
 
@@ -52,7 +52,8 @@ export interface ThreadsPost {
  * names are accepted for backwards-compatibility with v0.3 saved inputs.
  */
 export interface RawInput {
-    mode?: Mode;
+    /** `feed` is still accepted here only so validation can reject it with a clear message. */
+    mode?: Mode | 'feed';
     usernames?: string[];
     bulkUsernames?: string;
     keywords?: string[];
@@ -79,7 +80,6 @@ export interface NormalizedInput {
     usernames: string[];
     keywords: string[];
     postUrls: string[];
-    feedUrls: string[];
     searchSort?: SearchSort;
     dateFrom?: string;
     dateTo?: string;

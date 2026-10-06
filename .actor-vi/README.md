@@ -72,13 +72,12 @@ Phù hợp cho: marketer, researcher, developer SaaS, team social listening và 
 
 | Trường          | Kiểu     | Bắt buộc       | Mặc định | Mô tả                                          |
 | --------------- | -------- | -------------- | -------- | ---------------------------------------------- |
-| `mode`          | enum     | khuyến nghị    | `user`   | `user`, `hashtag`, `search`, `post`, `feed`    |
+| `mode`          | enum     | khuyến nghị    | `user`   | `user`, `hashtag`, `search`, `post` (`feed` sẽ làm lượt chạy thất bại kèm thông báo) |
 | `usernames`     | string[] | user mode      | —        | Username (không cần `@`)                       |
 | `bulkUsernames` | string   | optional       | —        | Dán danh sách username (mỗi dòng một username) |
 | `keywords`      | string[] | hashtag/search | —        | Từ khóa hoặc hashtag                           |
 | `bulkKeywords`  | string   | optional       | —        | Dán keyword hàng loạt                          |
 | `postUrls`      | string[] | post mode      | —        | URL bài Threads                                |
-| `feedUrls`      | string[] | feed mode      | —        | URL feed                                       |
 | `searchSort`    | enum     | optional       | `top`    | `top` hoặc `recent`                            |
 | `dateFrom`      | string   | optional       | —        | `YYYY-MM-DD` hoặc `7 days`, `1 month`          |
 | `dateTo`        | string   | optional       | —        | giống `dateFrom`                               |
