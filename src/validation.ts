@@ -4,7 +4,9 @@ const ABSOLUTE_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 const RELATIVE_DATE_PATTERN = /^(\d+)\s*(day|days|week|weeks|month|months|year|years)$/i;
 const USERNAME_PATTERN = /^@?[A-Za-z0-9._]{1,30}$/;
 const VALID_SORTS: readonly SearchSort[] = ['top', 'recent'];
-const VALID_MODES: readonly Mode[] = ['user', 'hashtag', 'search', 'post', 'feed'];
+const VALID_MODES: readonly Mode[] = ['user', 'hashtag', 'search', 'post'];
+export const FEED_UNSUPPORTED_MESSAGE =
+    'Mode "feed" is not supported: Threads serves custom feeds only to logged-in clients. Use user, hashtag, search or post.';
 
 const DEFAULT_MAX_POSTS = 50;
 const POSTS_PER_SCROLL = 10;
@@ -31,7 +33,10 @@ export function validateInput(raw: RawInput | null | undefined): NormalizedInput
     ]);
 
     const postUrls = filterNonEmpty(raw.postUrls);
-    const feedUrls = filterNonEmpty(raw.feedUrls);
+    // Feed needs a login. Failing here beats a SUCCEEDED run with 0 rows that the caller then pays the start fee for.
+    if (raw.mode === 'feed' || filterNonEmpty(raw.feedUrls).length > 0) {
+        throw new Error(FEED_UNSUPPORTED_MESSAGE);
+    }
 
     if (usernames.length > MAX_BATCH_SIZE) {
         throw new Error(`usernames exceeds max batch size of ${MAX_BATCH_SIZE}`);
@@ -46,7 +51,6 @@ export function validateInput(raw: RawInput | null | undefined): NormalizedInput
         }
     }
 
-    for (const url of feedUrls) assertThreadsHostname(url, 'feed');
     for (const url of postUrls) {
         assertThreadsHostname(url, 'post');
         const parsed = new URL(url);
@@ -59,9 +63,9 @@ export function validateInput(raw: RawInput | null | undefined): NormalizedInput
         throw new Error(`mode must be one of: ${VALID_MODES.join(', ')}`);
     }
 
-    const mode = raw.mode ?? autoDetectMode({ usernames, keywords, postUrls, feedUrls, raw });
+    const mode = raw.mode ?? autoDetectMode({ usernames, keywords, postUrls, raw });
 
-    assertModeHasInput(mode, { usernames, keywords, postUrls, feedUrls });
+    assertModeHasInput(mode, { usernames, keywords, postUrls });
 
     if (raw.searchSort !== undefined && !VALID_SORTS.includes(raw.searchSort)) {
         throw new Error(`searchSort must be one of: ${VALID_SORTS.join(', ')}`);
@@ -82,7 +86,6 @@ export function validateInput(raw: RawInput | null | undefined): NormalizedInput
         usernames,
         keywords,
         postUrls,
-        feedUrls,
         searchSort: raw.searchSort,
         dateFrom,
         dateTo,
@@ -97,22 +100,20 @@ function autoDetectMode(ctx: {
     usernames: string[];
     keywords: string[];
     postUrls: string[];
-    feedUrls: string[];
     raw: RawInput;
 }): Mode {
     if (ctx.postUrls.length > 0) return 'post';
-    if (ctx.feedUrls.length > 0) return 'feed';
     if (ctx.usernames.length > 0) return 'user';
     if (ctx.raw.searchTags && ctx.raw.searchTags.length > 0) return 'hashtag';
     if (ctx.keywords.length > 0) return 'search';
     throw new Error(
-        'Input is empty. Set "mode" and provide at least one of usernames, keywords, postUrls, or feedUrls.',
+        'Input is empty. Set "mode" and provide at least one of usernames, keywords or postUrls.',
     );
 }
 
 function assertModeHasInput(
     mode: Mode,
-    ctx: { usernames: string[]; keywords: string[]; postUrls: string[]; feedUrls: string[] },
+    ctx: { usernames: string[]; keywords: string[]; postUrls: string[] },
 ): void {
     switch (mode) {
         case 'user':
@@ -124,9 +125,6 @@ function assertModeHasInput(
             break;
         case 'post':
             if (ctx.postUrls.length === 0) throw new Error('mode "post" requires at least one postUrls entry');
-            break;
-        case 'feed':
-            if (ctx.feedUrls.length === 0) throw new Error('mode "feed" requires at least one feedUrls entry');
             break;
         default: {
             const _exhaustive: never = mode;

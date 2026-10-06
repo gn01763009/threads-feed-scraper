@@ -12,15 +12,13 @@
                 "user",
                 "hashtag",
                 "search",
-                "post",
-                "feed"
+                "post"
             ],
             "enumTitles": [
                 "👤 Trang cá nhân",
                 "🏷️ Thẻ / chủ đề",
                 "🔎 Tìm kiếm từ khóa",
-                "💬 Bài viết đơn",
-                "📰 URL feed tùy chỉnh (không khả dụng)"
+                "💬 Bài viết đơn"
             ],
             "default": "user",
             "prefill": "user",
@@ -103,16 +101,6 @@
             },
             "uniqueItems": true,
             "sectionCaption": "💬 Chế độ Bài viết / Feed"
-        },
-        "feedUrls": {
-            "title": "📰 URL feed",
-            "type": "array",
-            "description": "URL feed tùy chỉnh của Threads. Dùng khi Chế độ = Feed. Ví dụ: https://www.threads.com/custom_feed/18113589370710265.",
-            "editor": "stringList",
-            "items": {
-                "type": "string"
-            },
-            "uniqueItems": true
         },
         "maxPosts": {
             "title": "📊 Số bài tối đa",

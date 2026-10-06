@@ -8,13 +8,12 @@
             "type": "string",
             "description": "要抓什麼?選一個模式,下面對應的欄位填一下就好。**多數 fintech use case 用「🔎 關鍵字搜尋」最直觀**(直接餵 ticker / 公司名),其他模式視需求。",
             "editor": "select",
-            "enum": ["search", "hashtag", "user", "post", "feed"],
+            "enum": ["search", "hashtag", "user", "post"],
             "enumTitles": [
                 "🔎 關鍵字搜尋 — 個股 / 主題輿情(預設)",
                 "🏷️ 標籤 / 話題 — #台積電、#AI概念股",
                 "👤 用戶主頁 — KOL / 分析師抓貼文",
-                "💬 單篇貼文(不含留言)",
-                "📰 自訂動態 feed 網址(暫不可用,需登入)"
+                "💬 單篇貼文(不含留言)"
             ],
             "default": "search",
             "prefill": "search",
@@ -87,14 +86,6 @@
             "items": { "type": "string" },
             "uniqueItems": true,
             "sectionCaption": "💬 貼文 / 動態模式"
-        },
-        "feedUrls": {
-            "title": "📰 動態 feed 網址",
-            "type": "array",
-            "description": "Threads 自訂 feed 網址。例如:https://www.threads.com/custom_feed/18113589370710265。",
-            "editor": "stringList",
-            "items": { "type": "string" },
-            "uniqueItems": true
         },
 
         "maxPosts": {

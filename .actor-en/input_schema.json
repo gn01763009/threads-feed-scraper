@@ -12,15 +12,13 @@
                 "user",
                 "hashtag",
                 "search",
-                "post",
-                "feed"
+                "post"
             ],
             "enumTitles": [
                 "👤 User profile",
                 "🏷️ Tag / topic",
                 "🔎 Keyword search",
-                "💬 Single post",
-                "📰 Custom feed URL (unavailable)"
+                "💬 Single post"
             ],
             "default": "user",
             "prefill": "user",
@@ -103,16 +101,6 @@
             },
             "uniqueItems": true,
             "sectionCaption": "💬 Post / Feed Modes"
-        },
-        "feedUrls": {
-            "title": "📰 Feed URLs",
-            "type": "array",
-            "description": "Threads custom feed URLs. Used when Mode = Feed. Example: https://www.threads.com/custom_feed/18113589370710265.",
-            "editor": "stringList",
-            "items": {
-                "type": "string"
-            },
-            "uniqueItems": true
         },
         "maxPosts": {
             "title": "📊 Max Posts",

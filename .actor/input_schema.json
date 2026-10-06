@@ -12,15 +12,13 @@
                 "user",
                 "hashtag",
                 "search",
-                "post",
-                "feed"
+                "post"
             ],
             "enumTitles": [
                 "👤 用戶主頁 — 依帳號抓",
                 "🏷️ 標籤 / 話題",
                 "🔎 關鍵字搜尋",
-                "💬 單篇貼文",
-                "📰 自訂動態 feed 網址（暫不可用）"
+                "💬 單篇貼文"
             ],
             "default": "user",
             "prefill": "user",
@@ -103,16 +101,6 @@
             },
             "uniqueItems": true,
             "sectionCaption": "💬 貼文 / 動態模式"
-        },
-        "feedUrls": {
-            "title": "📰 動態 feed 網址",
-            "type": "array",
-            "description": "Threads 自訂 feed 網址。例如:https://www.threads.com/custom_feed/18113589370710265。",
-            "editor": "stringList",
-            "items": {
-                "type": "string"
-            },
-            "uniqueItems": true
         },
         "maxPosts": {
             "title": "📊 最多抓幾篇",

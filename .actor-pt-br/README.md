@@ -52,7 +52,7 @@ O Scraper opera em 5 modos distintos, selecionáveis via parâmetro `mode`:
 
 | Parâmetro | Tipo | Descrição |
 | :--- | :--- | :--- |
-| `mode` | `enum` | Escolha entre `user`, `hashtag`, `search`, `post`, `feed`. |
+| `mode` | `enum` | Escolha entre `user`, `hashtag`, `search`, `post` (`feed` faz a execução falhar com uma mensagem clara). |
 | `usernames` | `array` | Lista de handles (ex: `["zuck", "mosseri"]`). Máx 100. |
 | `bulkUsernames` | `string` | Texto livre para colar lista de usuários (um por linha). |
 | `maxPosts` | `int` | Limite de resultados por fonte (Default: 50). |
