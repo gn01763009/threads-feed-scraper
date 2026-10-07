@@ -76,6 +76,8 @@ export interface SearchFetchResult {
     /** Total HTTP requests across every form, for cost logging. */
     attempts: number;
     variants: SearchVariantReport[];
+    /** True when the run's deadline cut the fan-out short; `posts` holds what was collected before that. */
+    stoppedEarly: boolean;
     /** Set only when no form produced a usable page at all. */
     failure?: 'soft-blocked' | 'no-payload';
 }
@@ -135,10 +137,12 @@ async function fetchVariant(
     url: string,
     maxAttempts: number,
     newProxyUrl?: () => Promise<string | undefined>,
+    shouldStop?: () => boolean,
 ): Promise<VariantFetch> {
     let outcome: VariantFetch['outcome'] = 'no-payload';
 
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        if (shouldStop?.()) break;
         try {
             const proxyUrl = await newProxyUrl?.();
             const { body } = await gotScraping({ url, proxyUrl, timeout: { request: 30_000 } });
@@ -171,6 +175,8 @@ export interface SearchFetchOptions {
     /** Attempts per query form. Forms are independent, so this is not a total. */
     maxAttempts?: number;
     onVariant?: (report: SearchVariantReport) => void;
+    /** Checked before every query form and attempt; true means the run is out of time. */
+    shouldStop?: () => boolean;
 }
 
 /**
@@ -185,12 +191,18 @@ export async function fetchSearchPosts(keyword: string, options: SearchFetchOpti
     const variants: SearchVariantReport[] = [];
     let attempts = 0;
     let sawPage = false;
+    let stoppedEarly = false;
 
     for (const variant of buildSearchVariants(keyword, options.sort)) {
         if (byId.size >= options.maxPosts) break;
+        if (options.shouldStop?.()) {
+            stoppedEarly = true;
+            break;
+        }
 
-        const fetched = await fetchVariant(variant.url, maxAttempts, options.newProxyUrl);
+        const fetched = await fetchVariant(variant.url, maxAttempts, options.newProxyUrl, options.shouldStop);
         attempts += fetched.attempts;
+        if (fetched.html === null && options.shouldStop?.()) stoppedEarly = true;
 
         const before = byId.size;
         const raws = fetched.html === null ? [] : extractSsrPosts(fetched.html);
@@ -216,9 +228,9 @@ export async function fetchSearchPosts(keyword: string, options: SearchFetchOpti
     }
 
     const posts = [...byId.values()].slice(0, options.maxPosts);
-    if (sawPage || posts.length > 0) return { posts, attempts, variants };
+    if (sawPage || posts.length > 0) return { posts, attempts, variants, stoppedEarly };
 
     // Nothing was ever served — say which wall we hit rather than reporting an empty search.
     const blocked = variants.some((v) => v.outcome === 'soft-blocked');
-    return { posts, attempts, variants, failure: blocked ? 'soft-blocked' : 'no-payload' };
+    return { posts, attempts, variants, stoppedEarly, failure: blocked ? 'soft-blocked' : 'no-payload' };
 }

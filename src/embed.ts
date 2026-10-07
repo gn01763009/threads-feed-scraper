@@ -209,12 +209,13 @@ export interface EmbedFetchResult {
  */
 export async function fetchEmbedPost(
     postUrl: string,
-    options: { newProxyUrl?: () => Promise<string | undefined>; maxAttempts?: number },
+    options: { newProxyUrl?: () => Promise<string | undefined>; maxAttempts?: number; shouldStop?: () => boolean },
 ): Promise<EmbedFetchResult> {
     const maxAttempts = options.maxAttempts ?? 4;
     const url = `${postUrl.replace(/\/+$/, '')}/embed`;
 
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        if (options.shouldStop?.()) break;
         try {
             const proxyUrl = await options.newProxyUrl?.();
             const response = await gotScraping({ url, proxyUrl, timeout: { request: 30_000 }, throwHttpErrors: false });

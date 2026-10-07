@@ -230,12 +230,15 @@ export async function fetchSsrPosts(
         newProxyUrl?: () => Promise<string | undefined>;
         maxAttempts?: number;
         onAttempt?: (attempt: number, outcome: 'ok' | 'soft-blocked' | 'no-payload' | 'error') => void;
+        /** Checked before every attempt; true means the run is out of time, so give up instead of retrying. */
+        shouldStop?: () => boolean;
     },
 ): Promise<SsrFetchResult> {
     const maxAttempts = options.maxAttempts ?? 4;
     let lastFailure: SsrFetchResult['failure'] = 'no-payload';
 
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        if (options.shouldStop?.()) break;
         try {
             const proxyUrl = await options.newProxyUrl?.();
             const response = await gotScraping({ url, proxyUrl, timeout: { request: 30_000 } });
