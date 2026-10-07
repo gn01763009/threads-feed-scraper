@@ -1,5 +1,6 @@
 import { Actor, log } from 'apify';
 import { createRunBudget, parseRunLimit, pushWithinBudget } from './budget.js';
+import { createWatchdog, formatIncompleteLog, formatIncompleteStatus, isZhFirstActor } from './watchdog.js';
 import { validateInput } from './validation.js';
 import { buildSearchUrl, buildTagUrl, buildProfileUrl } from './urls.js';
 import { fetchEmbedPost } from './embed.js';
@@ -36,6 +37,28 @@ const pushPosts = (posts: readonly ThreadsPost[]): Promise<number> =>
     pushWithinBudget(budget, posts, (rows) => Actor.pushData(rows));
 
 const requests: { url: string; userData: RequestUserData }[] = buildRequests(input);
+
+// Stop starting new work shortly before the platform's timeout so the customer keeps a partial dataset
+// instead of a TIMED-OUT run. Absent ACTOR_TIMEOUT_AT (local runs) means no watchdog.
+const watchdog = createWatchdog({
+    timeoutAt: process.env.ACTOR_TIMEOUT_AT,
+    startedAt: process.env.ACTOR_STARTED_AT,
+    now: Date.now,
+});
+const shouldStop = watchdog.shouldStop;
+let processedSources = 0;
+let stoppedEarly = false;
+
+log.info(
+    watchdog.softDeadlineMs === undefined
+        ? 'Run timeout unknown (ACTOR_TIMEOUT_AT unset) — watchdog off'
+        : `Run timeout ${watchdog.totalTimeoutSecs}s, soft deadline ${new Date(watchdog.softDeadlineMs).toISOString()} (no new work after this)`,
+);
+
+/** One concise progress line per source: where we are and how many rows are out so far. */
+function logProgress(index: number, label: string, count: number, pushedSoFar: number): void {
+    log.info(`Source ${index + 1}/${requests.length} ${label}: ${count} posts (${pushedSoFar} so far)`);
+}
 
 log.info('Starting Threads scraper', {
     mode,
@@ -107,8 +130,12 @@ async function runSsrRequests(): Promise<number> {
     }
 
     let pushed = 0;
-    for (const { url, userData } of requests) {
+    for (const [index, { url, userData }] of requests.entries()) {
         if (budget.isExhausted()) break;
+        if (shouldStop()) {
+            stoppedEarly = true;
+            break;
+        }
         const { sourceType, sourceQuery } = userData;
         log.info(`Fetching ${sourceType}: ${url}`);
 
@@ -120,22 +147,31 @@ async function runSsrRequests(): Promise<number> {
             newProxyUrl: proxyConfiguration
                 ? async () => proxyConfiguration.newUrl(`ssr${Date.now()}${Math.random().toString(36).slice(2, 8)}`)
                 : undefined,
+            shouldStop,
             onAttempt: (attempt, outcome) => {
                 if (outcome !== 'ok') log.debug(`Attempt ${attempt} for ${sourceQuery}: ${outcome}`);
             },
         });
 
         if (result.failure) {
+            if (shouldStop()) {
+                // Retries were cut short by the deadline, so this source is unfinished, not failed.
+                stoppedEarly = true;
+                break;
+            }
             log.warning(
                 `No posts for ${sourceType} "${sourceQuery}" after ${result.attempts} attempts (${result.failure}). ` +
                     'Threads throttles by exit IP; a different proxy group or a later retry usually clears it.',
             );
+            processedSources++;
+            logProgress(index, sourceQuery, 0, pushed);
             continue;
         }
 
         const count = await pushPosts(filterByDateRange(result.posts).slice(0, maxPosts));
         pushed += count;
-        log.info(`  ${count} posts (${result.attempts} attempt(s))`);
+        processedSources++;
+        logProgress(index, sourceQuery, count, pushed);
     }
     return pushed;
 }
@@ -156,8 +192,12 @@ async function runSearchRequests(): Promise<number> {
     }
 
     let pushed = 0;
-    for (const { userData } of requests) {
+    for (const [index, { userData }] of requests.entries()) {
         if (budget.isExhausted()) break;
+        if (shouldStop()) {
+            stoppedEarly = true;
+            break;
+        }
         const { sourceType, sourceQuery } = userData;
         log.info(`Searching ${sourceType}: ${sourceQuery}`);
 
@@ -165,6 +205,7 @@ async function runSearchRequests(): Promise<number> {
             sourceType,
             maxPosts,
             sort: input.searchSort,
+            shouldStop,
             newProxyUrl: proxyConfiguration
                 ? async () => proxyConfiguration.newUrl(`search${Date.now()}${Math.random().toString(36).slice(2, 8)}`)
                 : undefined,
@@ -173,24 +214,29 @@ async function runSearchRequests(): Promise<number> {
         });
 
         if (result.failure) {
+            if (shouldStop()) {
+                stoppedEarly = true;
+                break;
+            }
             log.warning(
                 `No page served for "${sourceQuery}" after ${result.attempts} attempts (${result.failure}). ` +
                     'Threads throttles by exit IP; a different proxy group or a later retry usually clears it.',
             );
+            processedSources++;
+            logProgress(index, sourceQuery, 0, pushed);
             continue;
         }
 
-        const posts = filterByDateRange(result.posts).slice(0, maxPosts);
-        if (posts.length === 0) {
-            log.info(`  no results for "${sourceQuery}"`);
-            continue;
-        }
-
-        const count = await pushPosts(posts);
+        // A source cut short by the deadline keeps the posts it did collect, but is not counted as finished.
+        const count = await pushPosts(filterByDateRange(result.posts).slice(0, maxPosts));
         pushed += count;
-        log.info(
-            `  ${count} posts from ${result.variants.length} query form(s), ${result.attempts} request(s)`,
-        );
+        if (result.stoppedEarly) {
+            stoppedEarly = true;
+            logProgress(index, `${sourceQuery} (cut short)`, count, pushed);
+            break;
+        }
+        processedSources++;
+        logProgress(index, sourceQuery, count, pushed);
     }
     return pushed;
 }
@@ -204,16 +250,26 @@ async function runEmbedRequests(): Promise<number> {
     const proxyConfiguration = await Actor.createProxyConfiguration(input.proxyConfiguration);
     let pushed = 0;
 
-    for (const { url, userData } of requests) {
+    for (const [index, { url, userData }] of requests.entries()) {
         if (budget.isExhausted()) break;
+        if (shouldStop()) {
+            stoppedEarly = true;
+            break;
+        }
         log.info(`Fetching post: ${url}`);
         const result = await fetchEmbedPost(url, {
+            shouldStop,
             newProxyUrl: proxyConfiguration
                 ? async () => proxyConfiguration.newUrl(`embed${Date.now()}${Math.random().toString(36).slice(2, 8)}`)
                 : undefined,
         });
 
         if (!result.post) {
+            if (shouldStop() && result.failure !== 'unavailable') {
+                stoppedEarly = true;
+                break;
+            }
+            processedSources++;
             // "unavailable" is an answer about the post (deleted/private), not a failure of
             // ours — say which one it is rather than logging the same line for both.
             log.warning(
@@ -227,10 +283,13 @@ async function runEmbedRequests(): Promise<number> {
         const posts = filterByDateRange([result.post]);
         if (posts.length === 0) {
             log.info('  outside the requested date range');
+            processedSources++;
             continue;
         }
-        pushed += await pushPosts(posts);
-        log.info(`  ok (${result.attempts} attempt(s))`);
+        const count = await pushPosts(posts);
+        pushed += count;
+        processedSources++;
+        logProgress(index, url, count, pushed);
         void userData;
     }
     return pushed;
@@ -242,6 +301,13 @@ if (mode === 'user') {
     totalItems += await runSearchRequests();
 } else {
     totalItems += await runEmbedRequests();
+}
+
+if (stoppedEarly) {
+    // One line, marker first: the monorepo canary greps for it. Everything collected so far is already pushed.
+    const report = { processed: processedSources, total: requests.length, pushed: totalItems };
+    log.warning(formatIncompleteLog(report));
+    await Actor.setStatusMessage(formatIncompleteStatus(report, isZhFirstActor(Actor.getEnv().actorId)));
 }
 
 log.info(`Scraping complete. Total items: ${totalItems}`);
