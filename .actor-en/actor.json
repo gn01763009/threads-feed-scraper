@@ -2,8 +2,8 @@
     "$schema": "https://apify.com/schemas/v1/actor.ide.json",
     "actorSpecification": 1,
     "name": "threads-scraper",
-    "title": "Threads Scraper — Bulk Profile Posts (No Login, No API)",
-    "description": "Posts from any Threads profile: text, author, ISO timestamps, engagement metrics, media URLs. Up to 100 handles, relative dates. No login, no API token. $0.005 per result.\n⚠️ Custom-feed mode unavailable (needs login).",
+    "title": "Threads Scraper — Profile Posts, Keyword Search & Hashtags",
+    "description": "Threads scraper for public Meta Threads posts: search by keyword or hashtag, collect posts from up to 100 profiles per run, or fetch a post by URL. Text, author, ISO timestamps, likes, replies, reposts, quotes, shares and media URLs. No login, no API token. Export JSON, CSV or Excel.",
     "version": "1.0",
     "buildTag": "latest",
     "meta": {

@@ -1,0 +1,47 @@
+{
+    "gYxIBYI7YR97txviU": {
+        "seoTitle": "Threads 爬蟲｜用戶貼文、關鍵字搜尋、Hashtag（免 API）",
+        "seoDescription": "Threads 爬蟲：依帳號批量抓貼文、用關鍵字或 hashtag 搜尋公開貼文、抓單篇貼文，含讚、回覆、轉發、引用、分享與媒體網址。免登入、免 API token，輸出 JSON／CSV／Excel。",
+        "categories": [
+            "SOCIAL_MEDIA",
+            "AI",
+            "LEAD_GENERATION"
+        ]
+    },
+    "gnvZoX4vwrEze1dos": {
+        "seoTitle": "Threads Scraper — Profile Posts, Keyword Search & Hashtags",
+        "seoDescription": "Scrape Meta Threads posts by keyword, hashtag, profile or post URL with full engagement data. No login or API token. Export JSON, CSV or Excel.",
+        "categories": [
+            "SOCIAL_MEDIA",
+            "AI",
+            "LEAD_GENERATION"
+        ]
+    },
+    "n8Bf8q0wtO0Pwwxuj": {
+        "seoTitle": "Threads Scraper — Posts, Busca e Hashtags (Sem Login)",
+        "seoDescription": "Extraia posts do Meta Threads por palavra-chave, hashtag, perfil ou URL, com métricas de engajamento completas. Sem login nem token de API. Exporte em JSON, CSV ou Excel.",
+        "categories": [
+            "SOCIAL_MEDIA",
+            "AI",
+            "LEAD_GENERATION"
+        ]
+    },
+    "NirQxxKuNimRK3Ae4": {
+        "seoTitle": "Threadsスクレイパー — 投稿・キーワード検索・ハッシュタグ",
+        "seoDescription": "Threads の公開投稿をキーワード、ハッシュタグ（hashtag）、プロフィール、投稿 URL から取得。エンゲージメント指標とメディア URL 付き。ログイン不要、JSON／CSV／Excel 出力。",
+        "categories": [
+            "SOCIAL_MEDIA",
+            "AI",
+            "LEAD_GENERATION"
+        ]
+    },
+    "NEziwa5cuMejscm2W": {
+        "seoTitle": "Threads Scraper — Bài Viết, Tìm Từ Khóa & Hashtag",
+        "seoDescription": "Thu thập bài viết Meta Threads theo từ khóa, hashtag, trang cá nhân hoặc URL, kèm đầy đủ chỉ số tương tác. Không cần đăng nhập hay API token. Xuất JSON, CSV hoặc Excel.",
+        "categories": [
+            "SOCIAL_MEDIA",
+            "AI",
+            "LEAD_GENERATION"
+        ]
+    }
+}

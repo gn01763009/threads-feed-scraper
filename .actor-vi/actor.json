@@ -2,8 +2,8 @@
     "$schema": "https://apify.com/schemas/v1/actor.ide.json",
     "actorSpecification": 1,
     "name": "threads-scraper-vi",
-    "title": "Threads Scraper — Thu Thập Bài Viết Hàng Loạt (Không Đăng Nhập)",
-    "description": "Bài viết từ mọi trang cá nhân Threads: nội dung, tác giả, thời gian ISO, chỉ số tương tác, URL media. Tối đa 100 tài khoản, ngày tương đối. Không đăng nhập, không API token. $0.005/kết quả.\n⚠️ Feed tùy chỉnh không khả dụng (cần đăng nhập).",
+    "title": "Threads Scraper — Bài Viết, Tìm Từ Khóa & Hashtag",
+    "description": "Threads scraper cho bài viết công khai trên Meta Threads: tìm theo từ khóa hoặc hashtag, thu thập bài viết từ tối đa 100 trang cá nhân, hoặc lấy một bài viết theo URL. Nội dung, tác giả, thời gian ISO, lượt thích, trả lời, đăng lại, trích dẫn, chia sẻ và URL media. Không đăng nhập, không API token.",
     "version": "1.0",
     "buildTag": "latest",
     "meta": {
