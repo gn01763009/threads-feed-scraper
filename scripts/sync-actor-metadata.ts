@@ -1,11 +1,16 @@
 #!/usr/bin/env tsx
 /**
- * Sync the current .actor/actor.json title + description to the already-deployed
- * Actor on Apify. `apify push` only updates the *build* — it does NOT update the
- * Actor-level title/description displayed on the Store listing. This script
- * patches those via the Apify API.
+ * Sync the Store listing to the already-deployed Actor on Apify. `apify push` only
+ * updates the *build* — it does NOT update the Actor-level title/description displayed
+ * on the Store listing. This script patches those via the Apify API.
  *
- * Usage: tsx scripts/sync-actor-metadata.ts <actorId>
+ * Title + description come from an actor.json. The SEO title, SEO description and Store
+ * categories have no home in actor.json, so they live in scripts/store-listings.json,
+ * keyed by Actor ID; an Actor without an entry there only gets title + description.
+ *
+ * Usage: tsx scripts/sync-actor-metadata.ts <actorId> [actorDir]
+ *   actorDir defaults to .actor — pass e.g. .actor-en to sync a locale's listing
+ *   without pushing a build.
  *
  * Token source, in order: APIFY_TOKEN, then ~/.apify/auth.json, then the macOS
  * keyring. Never passed via command line — only sent via Authorization header.
@@ -19,6 +24,29 @@ import { resolve } from 'node:path';
 interface ActorJson {
     title?: string;
     description?: string;
+}
+
+export interface StoreListing {
+    seoTitle: string;
+    seoDescription: string;
+    categories: string[];
+}
+
+export type MetadataPatch = Required<ActorJson> & Partial<StoreListing>;
+
+/** The exact body sent to the Apify API — kept pure so the listing rules are unit-testable. */
+export function buildMetadataPatch(actorJson: ActorJson, listing: StoreListing | undefined): MetadataPatch {
+    if (!actorJson.title || !actorJson.description) {
+        throw new Error('Missing title or description in actor.json');
+    }
+    const base = { title: actorJson.title, description: actorJson.description };
+    if (!listing) return base;
+    return {
+        ...base,
+        seoTitle: listing.seoTitle,
+        seoDescription: listing.seoDescription,
+        categories: [...listing.categories],
+    };
 }
 
 interface ApifyAuth {
@@ -71,20 +99,20 @@ function readToken(): string {
  * Callers that run this as part of push-locale should invoke it while the
  * locale-specific .actor/ is still swapped in — it reads from ./.actor/actor.json.
  */
-export async function syncActorMetadata(actorId: string): Promise<void> {
+export async function syncActorMetadata(actorId: string, actorDir = '.actor'): Promise<void> {
     const token = readToken();
 
     const repoRoot = resolve(import.meta.dirname ?? '.', '..');
-    const actorJsonPath = resolve(repoRoot, '.actor', 'actor.json');
+    const actorJsonPath = resolve(repoRoot, actorDir, 'actor.json');
     const actorJson = JSON.parse(readFileSync(actorJsonPath, 'utf8')) as ActorJson;
+    const listingsPath = resolve(repoRoot, 'scripts', 'store-listings.json');
+    const listings = JSON.parse(readFileSync(listingsPath, 'utf8')) as Record<string, StoreListing>;
+    const patch = buildMetadataPatch(actorJson, listings[actorId]);
 
-    if (!actorJson.title || !actorJson.description) {
-        throw new Error(`Missing title or description in ${actorJsonPath}`);
-    }
-
-    console.log(`Syncing metadata to Actor ${actorId}`);
-    console.log(`  title:       ${actorJson.title}`);
-    console.log(`  description: ${actorJson.description.slice(0, 80)}...`);
+    console.log(`Syncing metadata to Actor ${actorId} from ${actorJsonPath}`);
+    console.log(`  title:       ${patch.title}`);
+    console.log(`  description: ${patch.description.slice(0, 80)}...`);
+    console.log(`  seo fields:  ${patch.seoTitle ? `${patch.seoTitle} | ${patch.categories?.join(', ')}` : '(none listed)'}`);
 
     const res = await fetch(`https://api.apify.com/v2/acts/${actorId}`, {
         method: 'PUT',
@@ -92,10 +120,7 @@ export async function syncActorMetadata(actorId: string): Promise<void> {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-            title: actorJson.title,
-            description: actorJson.description,
-        }),
+        body: JSON.stringify(patch),
     });
 
     if (!res.ok) {
@@ -110,10 +135,10 @@ export async function syncActorMetadata(actorId: string): Promise<void> {
 if (import.meta.url === `file://${process.argv[1]}`) {
     const actorId = process.argv[2];
     if (!actorId) {
-        console.error('Usage: tsx scripts/sync-actor-metadata.ts <actorId>');
+        console.error('Usage: tsx scripts/sync-actor-metadata.ts <actorId> [actorDir]');
         process.exit(1);
     }
-    syncActorMetadata(actorId).catch((err) => {
+    syncActorMetadata(actorId, process.argv[3]).catch((err) => {
         console.error(err instanceof Error ? err.message : err);
         process.exit(1);
     });

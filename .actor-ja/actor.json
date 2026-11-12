@@ -2,8 +2,8 @@
     "$schema": "https://apify.com/schemas/v1/actor.ide.json",
     "actorSpecification": 1,
     "name": "threads-scraper-ja",
-    "title": "Threadsスクレイパー — プロフィール投稿の一括取得（ログイン不要）",
-    "description": "任意の Threads プロフィールから投稿を取得：本文、投稿者、ISO タイムスタンプ、エンゲージメント指標、メディア URL。最大 100 アカウント、相対日付フィルタ対応。純 HTTP — ログイン不要、API トークン不要、アカウント運用不要。1 件 $0.005。\n⚠️ カスタムフィードのモードは利用できません（Threads が未ログインに配信しないため）。",
+    "title": "Threadsスクレイパー — 投稿・キーワード検索・ハッシュタグ（ログイン不要）",
+    "description": "Threads スクレイパー（ログイン不要・API トークン不要）：キーワードやハッシュタグ（hashtag）で公開投稿を検索、最大 100 アカウントのプロフィール投稿を一括取得、または投稿 URL から 1 件取得。本文、投稿者、ISO タイムスタンプ、いいね・返信・リポスト・引用・シェア数、メディア URL を JSON／CSV／Excel で出力。",
     "version": "1.0",
     "buildTag": "latest",
     "meta": {
